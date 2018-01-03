@@ -1,0 +1,22 @@
+language: node_js
+node_js:
+  - "8"
+
+dist: trusty
+
+install:
+  - wget https://github.com/nats-io/gnatsd/releases/download/v1.0.4/gnatsd-v1.0.4-linux-amd64.zip
+  - unzip -p gnatsd-v1.0.4-linux-amd64.zip gnatsd-v1.0.4-linux-amd64/gnatsd > gnatsd
+  - chmod +x gnatsd
+  - npm install
+
+script:
+  - npm run prettier:check
+  - npm run lint
+  - ./gnatsd &
+  - sleep 5
+  - npm run test:coverage
+
+after_success:
+  - npm install -g coveralls
+  - cat ./coverage/lcov.info | coveralls --verbose
