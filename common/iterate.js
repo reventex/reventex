@@ -13,19 +13,31 @@ export async function iterate(commandExecutorMap, iterator, context) {
         }
         command = step.value;
 
-        if (command[symbol] === CommandType.EXIT) {
+        if (command && command[symbol] === CommandType.EXIT) {
             while (matches.length > 0) {
                 matches.pop();
             }
             resolve();
-            break;
+            return;
         }
 
-        const commandExecutor = commandExecutorMap[command[symbol]];
+        const commandExecutor = command && commandExecutorMap[command[symbol]];
         if (commandExecutor) {
-            result = await commandExecutor(command, context);
+            try {
+                result = await commandExecutor(command, context);
+            } catch (error) {
+                while (matches.length > 0) {
+                    matches.pop();
+                }
+                reject(error);
+                return;
+            }
         } else {
+            while (matches.length > 0) {
+                matches.pop();
+            }
             reject(new Error('Unknown command'));
+            return;
         }
     }
 }
