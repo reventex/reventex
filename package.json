@@ -7,28 +7,19 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint .",
-    "prettier": "prettier-eslint ./client/**/*.js ./common/**/*.js ./server/**/*.js ./tests/**/*.js --write --trailing-comma=all --single-quote --semi --bracket-spacing --tab-width=4",
-    "prettier:check": "if [ \"$(prettier-eslint ./client/**/*.js ./common/**/*.js ./server/**/*.js ./tests/**/*.js --list-different --trailing-comma=all --single-quote --semi --bracket-spacing --tab-width=4)\" ]; then exit 1; fi"
+    "prettier": "prettier ./src/**/*.ts --write --trailing-comma=all --single-quote --semi --bracket-spacing --tab-width=2",
+    "prettier:check": "if [ \"$(prettier ./src/**/*.ts --list-different --trailing-comma=all --single-quote --semi --bracket-spacing --tab-width=2)\" ]; then exit 1; fi"
   },
-  "pre-commit": [
-    "prettier",
-    "lint",
-    "test"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/reventex/reventex.git"
   },
   "keywords": [
-    "game",
-    "engine",
+    "ddd",
+    "eventsourcing",
     "reactive",
     "functional",
-    "game-engine",
-    "gamedev",
-    "game-development",
-    "javascript",
-    "event-driven"
+    "typescript"
   ],
   "author": "Mr.Cheater (Anton Zhukov)",
   "license": "MIT",
@@ -37,24 +28,13 @@
   },
   "homepage": "https://github.com/reventex/reventex#readme",
   "devDependencies": {
-    "babel-eslint": "^8.1.2",
-    "babel-plugin-module-resolver": "^3.0.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.1",
-    "eslint": "^4.14.0",
-    "jest": "^22.0.4",
-    "pre-commit": "^1.2.2",
-    "prettier-eslint-cli": "^4.7.0",
-    "sinon": "^4.1.3"
+    "prettier": "2.2.1",
+    "eslint": "7.22.0",
+    "jest": "26.6.3",
+    "typescript": "4.2.3"
   },
   "dependencies": {
-    "co-body": "^5.1.1",
-    "koa": "^2.4.1",
-    "koa-router": "^7.3.0",
-    "koa-static": "^4.0.2",
-    "nats": "^0.7.24",
-    "pixi.js": "^4.6.2",
-    "uuid": "^3.1.0"
+    "io-ts": "2.2.16",
+    "fp-ts": "2.9.5"
   }
 }
