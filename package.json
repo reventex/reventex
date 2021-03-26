@@ -1,7 +1,7 @@
 {
   "name": "reventex",
   "version": "0.0.3",
-  "description": "A Functional Reactive Game Engine",
+  "description": "Full stack Event Sourcing, DDD framework for Node.js",
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
@@ -15,11 +15,12 @@
     "url": "git+https://github.com/reventex/reventex.git"
   },
   "keywords": [
-    "ddd",
     "eventsourcing",
     "reactive",
     "functional",
-    "typescript"
+    "typescript",
+    "ddd",
+    "es"
   ],
   "author": "Mr.Cheater (Anton Zhukov)",
   "license": "MIT",
@@ -27,14 +28,18 @@
     "url": "https://github.com/reventex/reventex/issues"
   },
   "homepage": "https://github.com/reventex/reventex#readme",
+  "dependencies": {
+    "io-ts": "2.2.16",
+    "fp-ts": "2.9.5"
+  },
   "devDependencies": {
     "prettier": "2.2.1",
     "eslint": "7.22.0",
     "jest": "26.6.3",
-    "typescript": "4.2.3"
+    "typescript": "4.2.3",
+    "mongodb": "^4.0.0-beta.2"
   },
-  "dependencies": {
-    "io-ts": "2.2.16",
-    "fp-ts": "2.9.5"
+  "peerDependencies": {
+    "mongodb": "^4.0.0-beta.2"
   }
 }

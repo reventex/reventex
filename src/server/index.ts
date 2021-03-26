@@ -1,3 +1,4 @@
+import { MongoClient } from "mongodb";
 import * as t from "io-ts";
 
 import validate from "./validate";
@@ -30,18 +31,21 @@ class Domain<
   > = {},
   EventTypes extends ReadonlyArray<Narrowable> = []
 > {
+  readonly connection: Promise<MongoClient>;
   readonly databaseName: DatabaseName;
   readonly eventStoreCollectionName: EventStoreCollectionName;
   readonly events: Events;
   readonly eventTypes: EventTypes;
   readonly projections: Projections;
   constructor(
+    connection: Promise<MongoClient>,
     databaseName: DatabaseName = null,
     eventStoreCollectionName: EventStoreCollectionName = null,
     events: Events = [] as any,
     eventTypes: EventTypes = [] as any,
     projections: Projections = {} as any
   ) {
+    this.connection = connection;
     this.databaseName = databaseName;
     this.eventStoreCollectionName = eventStoreCollectionName;
     this.events = events;
@@ -58,6 +62,7 @@ class Domain<
     readonly [...EventTypes, EventType]
   > {
     return new Domain<any, any, any, any, any>(
+      this.connection,
       this.databaseName,
       this.eventStoreCollectionName,
       { ...this.events },
@@ -83,6 +88,7 @@ class Domain<
     readonly [...EventTypes]
   > {
     return new Domain<any, any, any, any, any>(
+      this.connection,
       this.databaseName,
       this.eventStoreCollectionName,
       { ...this.events },
@@ -105,6 +111,7 @@ class Domain<
     readonly [...EventTypes, Type]
   > {
     return new Domain<any, any, any, any, any>(
+      this.connection,
       this.databaseName,
       this.eventStoreCollectionName,
       { ...this.events, [type]: t.type(payloadSchema) },
@@ -125,6 +132,7 @@ class Domain<
     readonly [...EventTypes]
   > {
     return new Domain<any, any, any, any, any>(
+      this.connection,
       name,
       this.eventStoreCollectionName,
       { ...this.events },
@@ -145,6 +153,7 @@ class Domain<
     readonly [...EventTypes]
   > {
     return new Domain<any, any, any, any, any>(
+      this.connection,
       this.databaseName,
       name,
       { ...this.events },
@@ -154,11 +163,44 @@ class Domain<
       [...this.eventTypes]
     );
   }
+
+  connect(
+    connection: Promise<MongoClient>
+  ): Domain<
+    DatabaseName,
+    EventStoreCollectionName,
+    Events,
+    Projections,
+    readonly [...EventTypes]
+  > {
+    return new Domain<any, any, any, any, any>(
+      connection,
+      this.databaseName,
+      this.eventStoreCollectionName,
+      { ...this.events },
+      {
+        ...this.projections,
+      },
+      [...this.eventTypes]
+    );
+  }
 }
 
-const domain = () => new Domain();
+const domain = {
+  connect(connection: Promise<MongoClient>) {
+    return new Domain(connection);
+  },
+};
 
-const app = domain()
+const MONGO_USER = "MONGO_USER";
+const MONGO_PASSWORD = "MONGO_PASSWORD";
+const MONGO_DOMAIN = "MONGO_DOMAIN";
+const MONGO_DATABASE = "MONGO_DATABASE";
+
+const mongoConnectionUrl = `mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_DOMAIN}/${MONGO_DATABASE}?retryWrites=true&w=majority`;
+
+const app = domain
+  .connect(MongoClient.connect(mongoConnectionUrl))
   .database("dbname")
   .eventStore("events")
   .event("create", { a: t.boolean })
