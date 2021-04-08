@@ -28,6 +28,14 @@ const books = declareProjection("book", events)
     yield get("ddd");
   });
 
+const getAllUsers = declareResolver("getAllUsers")
+  .args()
+  .result({ users: t.array(t.string) })
+  .implementation(async () => {
+    const users: Array<string> = [];
+    return users;
+  });
+
 // const getAllUsers = declareResolver('getAllUsers', t.any, t.array(t.type({ userId: t.string })))
 //
 // const domain = declareDomain()
