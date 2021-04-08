@@ -1,33 +1,32 @@
-import * as t from 'io-ts'
+import * as t from "io-ts";
 
-import declareEvents from './declareEvents'
-import declareProjection from './declareProjection'
+import declareEvents from "./declareEvents";
+import declareProjection from "./declareProjection";
 
 const events = declareEvents()
-  .event('create', { a: t.boolean })
-  .event('drop', { a: t.boolean })
-  .event('dispose', { a: t.boolean })
+  .event("create", { a: t.boolean })
+  .event("drop", { b: t.boolean })
+  .event("dispose", { a: t.boolean });
 
-const users = declareProjection('users', events)
-  .on('create', ()=>{})
-  .on('drop', ()=>{})
+const users = declareProjection("users", events)
+  .on("create", function* (event, { get }) {
+    const a: boolean = event.payload.a;
+    yield get("ddd");
+  })
+  .on("drop", function* (event, { get }) {
+    const a: boolean = event.payload.b;
+    yield get("ddd");
+  });
 
-const books = declareProjection('book', events)
-  .on('create', ()=>{})
-  .on('drop', ()=>{})
-
-function* foo(event: {a:boolean}, api: {get:(key:string)=>string}) {
-  yield api.get('sdfsdf')
-  yield api.get('sdfsdf')
-  yield api.get('sdfsdf')
-  return undefined
-}
-
-type sdfsf = typeof foo
-//
-
-// f = (event: {     a: boolean; }, api: {     get: (key: string) => string; }) => Generator<string, undefined, unknown>
-
+const books = declareProjection("book", events)
+  .on("create", function* (event, { get }) {
+    const a: boolean = event.payload.a;
+    yield get("ddd");
+  })
+  .on("drop", function* (event, { get }) {
+    const a: boolean = event.payload.b;
+    yield get("ddd");
+  });
 
 // const getAllUsers = declareResolver('getAllUsers', t.any, t.array(t.type({ userId: t.string })))
 //

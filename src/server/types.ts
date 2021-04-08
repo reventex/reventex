@@ -1,7 +1,4 @@
-export type NarrowableString =
-  | string
-  | number
-  | symbol
+export type NarrowableString = string | number | symbol;
 
 export type Narrowable =
   | string
@@ -16,10 +13,24 @@ export type Narrowable =
 
 export type ValuesOfTuple<
   T extends ReadonlyArray<any>
-  > = T extends ReadonlyArray<any> ? T[number] : never;
+> = T extends ReadonlyArray<any> ? T[number] : never;
 
-export type UnionOfTuple<T extends ReadonlyArray<any>> = T[number]
+export type UnionOfTuple<T extends ReadonlyArray<any>> = T[number];
 
-export type ExcludeFromTuple<T extends ReadonlyArray<any>, E> =
-  T extends readonly [infer F, ...infer R] ? F extends E ? ExcludeFromTuple<R, E> :
-    readonly [F, ...ExcludeFromTuple<R, E>] : readonly []
+export type ExcludeFromTuple<
+  T extends ReadonlyArray<any>,
+  E
+> = T extends readonly [infer F, ...infer R]
+  ? F extends E
+    ? ExcludeFromTuple<R, E>
+    : readonly [F, ...ExcludeFromTuple<R, E>]
+  : readonly [];
+
+export type Event<PayloadSchema extends Record<string, unknown>> = {
+  timestamp: number;
+  payload: PayloadSchema;
+};
+
+export type MutationApi = {
+  get(key: string): string;
+};
