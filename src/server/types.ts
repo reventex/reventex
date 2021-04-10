@@ -1,3 +1,5 @@
+import * as t from 'io-ts'
+
 export type NarrowableString = string | number | symbol;
 
 export type Narrowable =
@@ -25,6 +27,12 @@ export type ExcludeFromTuple<
     ? ExcludeFromTuple<R, E>
     : readonly [F, ...ExcludeFromTuple<R, E>]
   : readonly [];
+
+export type TypesOf<
+  T extends ReadonlyArray<t.Any>
+  > = T extends readonly [infer F, ...infer R]
+  ? F extends t.Any ? R extends ReadonlyArray<t.Any> ? readonly [t.TypeOf<F>, ...TypesOf<R>]  : never  : never
+  : [];
 
 export type Event<PayloadSchema extends Record<string, unknown>> = {
   timestamp: number;

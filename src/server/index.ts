@@ -2,6 +2,7 @@ import * as t from "io-ts";
 
 import declareEvents from "./declareEvents";
 import declareProjection from "./declareProjection";
+import { NarrowableString, TypesOf } from "./types";
 
 const events = declareEvents()
   .event("create", { a: t.boolean })
@@ -28,12 +29,37 @@ const books = declareProjection("book", events)
     yield get("ddd");
   });
 
+function declareResolver<ResolverName extends NarrowableString>(
+  name: ResolverName
+) {
+  function withArgs<Args extends ReadonlyArray<t.Type<any>>>(
+    ...inputSchemas: Args
+  ) {
+    function returns<Result extends t.Type<any>>(outputSchema: Result) {
+      function _implements(
+        implementation: (...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>
+      ) {
+        return implementation;
+      }
+      return {
+        implements: _implements,
+      };
+    }
+    return {
+      returns,
+    };
+  }
+  return {
+    withArgs,
+  };
+}
+
 const getAllUsers = declareResolver("getAllUsers")
-  .args()
-  .result({ users: t.array(t.string) })
-  .implementation(async () => {
+  .withArgs(t.type({}), t.void)
+  .returns(t.type({ users: t.array(t.string) }))
+  .implements(async (a, b) => {
     const users: Array<string> = [];
-    return users;
+    return { users };
   });
 
 // const getAllUsers = declareResolver('getAllUsers', t.any, t.array(t.type({ userId: t.string })))
