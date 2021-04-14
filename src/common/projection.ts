@@ -1,16 +1,17 @@
-import * as t from "io-ts";
+import * as t from 'io-ts';
+
 import {
   Event,
   MutationApi,
   NarrowableString,
   UnionOfTuple,
   ExcludeFromTuple,
-} from "./types";
-import { Events } from "./declareEvents";
+} from './types';
+import { Events } from './events';
 
 export class Projection<
   ProjectionName extends NarrowableString,
-  PayloadSchemas extends Record<NarrowableString, t.TypeC<any>>,
+  PayloadSchemas extends Record<UnionOfTuple<EventTypes>, t.Type<any>>,
   EventTypes extends ReadonlyArray<NarrowableString>
 > {
   readonly name: ProjectionName;
@@ -18,7 +19,7 @@ export class Projection<
 
   constructor(
     name: ProjectionName,
-    events: Events<PayloadSchemas, EventTypes>
+    events: Events<PayloadSchemas, EventTypes>,
   ) {
     this.name = name;
     this.events = events;
@@ -27,9 +28,9 @@ export class Projection<
   on<EventType extends UnionOfTuple<EventTypes>>(
     eventType: EventType,
     handler: (
-      event: Event<t.TypeOf<PayloadSchemas[EventType]>>,
-      api: MutationApi
-    ) => Generator<string, void, unknown>
+      event: Event<PayloadSchemas[EventType]>,
+      api: MutationApi,
+    ) => Generator<string, void, unknown>,
   ): Projection<
     ProjectionName,
     PayloadSchemas,
@@ -39,15 +40,16 @@ export class Projection<
   }
 }
 
-function declareProjection<
+export function projection<
   ProjectionName extends NarrowableString,
-  PayloadSchemas extends Record<NarrowableString, t.TypeC<any>>,
+  PayloadSchemas extends Record<UnionOfTuple<EventTypes>, t.Type<any>>,
   EventTypes extends ReadonlyArray<NarrowableString>
 >(
   name: ProjectionName,
-  events: Events<PayloadSchemas, EventTypes>
+  events: Events<PayloadSchemas, EventTypes>,
 ): Projection<ProjectionName, PayloadSchemas, EventTypes> {
-  return new Projection(name, events);
+  return new Projection<ProjectionName, PayloadSchemas, EventTypes>(
+    name,
+    events,
+  );
 }
-
-export default declareProjection;

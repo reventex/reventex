@@ -1,16 +1,16 @@
-import * as t from "io-ts";
-import { PathReporter } from "io-ts/lib/PathReporter";
-import { isRight } from "fp-ts/lib/Either";
+import * as t from 'io-ts';
+import { PathReporter } from 'io-ts/lib/PathReporter';
+import { isRight } from 'fp-ts/lib/Either';
 
-function validate<T extends t.Type<any>>(
+export function validate<T extends t.Any>(
   schema: T,
   params: any,
-  errorName?: string
+  errorName?: string,
 ): t.TypeOf<T> {
   const validationResult = schema.decode(params);
   if (!isRight(validationResult)) {
     const messages = PathReporter.report(validationResult);
-    const error = new Error(messages.join("\n"));
+    const error = new Error(messages.join('\n'));
     if (errorName != null) {
       error.name = errorName;
     }
@@ -18,5 +18,3 @@ function validate<T extends t.Type<any>>(
   }
   return params;
 }
-
-export default validate;
