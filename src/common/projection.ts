@@ -6,6 +6,8 @@ import {
   NarrowableString,
   UnionOfTuple,
   ExcludeFromTuple,
+  EffectKVS,
+  EffectNames,
 } from './types';
 import { Events } from './events';
 
@@ -16,13 +18,16 @@ export class Projection<
 > {
   readonly name: ProjectionName;
   readonly events: Events<PayloadSchemas, EventTypes>;
+  readonly handlers: Record<UnionOfTuple<EventTypes>, any>;
 
   constructor(
     name: ProjectionName,
     events: Events<PayloadSchemas, EventTypes>,
+    handlers: Record<UnionOfTuple<EventTypes>, any> = {} as any,
   ) {
     this.name = name;
     this.events = events;
+    this.handlers = handlers;
   }
 
   on<EventType extends UnionOfTuple<EventTypes>>(
@@ -30,13 +35,12 @@ export class Projection<
     handler: (
       event: Event<PayloadSchemas[EventType]>,
       api: MutationApi,
-    ) => Generator<string, void, unknown>,
-  ): Projection<
-    ProjectionName,
-    PayloadSchemas,
-    ExcludeFromTuple<EventTypes, EventType>
-  > {
-    return this as any;
+    ) => Generator<EffectKVS<EffectNames, any, any, any>, void, unknown>,
+  ): Projection<ProjectionName, PayloadSchemas, ExcludeFromTuple<EventTypes, EventType>> {
+    return new Projection<any, any, any>(this.name, this.events, {
+      ...this.handlers,
+      [eventType]: handler,
+    });
   }
 }
 
@@ -48,8 +52,5 @@ export function projection<
   name: ProjectionName,
   events: Events<PayloadSchemas, EventTypes>,
 ): Projection<ProjectionName, PayloadSchemas, EventTypes> {
-  return new Projection<ProjectionName, PayloadSchemas, EventTypes>(
-    name,
-    events,
-  );
+  return new Projection<ProjectionName, PayloadSchemas, EventTypes>(name, events);
 }

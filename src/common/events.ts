@@ -20,10 +20,10 @@ export class Events<
     PayloadSchemas & Record<EventType, PayloadSchema>,
     readonly [...EventTypes, EventType]
   > {
-    return new Events<any, any>(
-      { ...this.payloadSchemas, [eventType]: payloadSchema },
-      [...this.eventTypes, eventType],
-    );
+    return new Events<any, any>({ ...this.payloadSchemas, [eventType]: payloadSchema }, [
+      ...this.eventTypes,
+      eventType,
+    ]);
   }
 }
 

@@ -4,7 +4,7 @@
   "description": "Full stack Event Sourcing, DDD framework for Node.js",
   "main": "dist/index.js",
   "scripts": {
-    "prepare": "tsc",
+    "build": "tsc",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint .",
@@ -30,15 +30,19 @@
   },
   "homepage": "https://github.com/reventex/reventex#readme",
   "dependencies": {
-    "io-ts": "2.2.16",
-    "fp-ts": "2.9.5"
+    "fp-ts": "2.10.0",
+    "io-ts": "2.2.16"
   },
   "devDependencies": {
-    "prettier": "2.2.1",
-    "eslint": "7.23.0",
-    "jest": "26.6.3",
-    "typescript": "4.2.4",
-    "mongodb": "^4.0.0-beta.3"
+    "@types/node": "^14.14.37",
+    "@typescript-eslint/eslint-plugin": "4.22.0",
+    "@typescript-eslint/parser": "4.22.0",
+    "@yarnpkg/pnpify": "^3.0.0-rc.3",
+    "eslint": "^7.24.0",
+    "jest": "^26.6.3",
+    "mongodb": "^4.0.0-beta.3",
+    "prettier": "^2.2.1",
+    "typescript": "^4.2.4"
   },
   "peerDependencies": {
     "mongodb": "^4.0.0-beta.3"

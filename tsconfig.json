@@ -18,6 +18,6 @@
     "resolveJsonModule": true,
     "noUncheckedIndexedAccess": true,
     "composite": false,
-    "types": ["node"]
+    "types": ["node"],
   }
 }

@@ -61,4 +61,6 @@ dist
 .idea
 package-lock.json
 lib/
-
+.yarn/*
+.pnp.js
+.yarnrc.yml
