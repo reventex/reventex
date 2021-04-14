@@ -1,5 +1,7 @@
 import * as t from 'io-ts';
 
+/* Helpers */
+
 export type NarrowableString = string;
 
 export type UnionOfTuple<T extends ReadonlyArray<any>> = T[number];
@@ -20,11 +22,6 @@ export type TypesOf<T extends ReadonlyArray<t.Any>> = T extends readonly [infer 
       : never
     : never
   : [];
-
-export type Event<PayloadSchema extends t.Any> = {
-  timestamp: number;
-  payload: t.TypeOf<PayloadSchema>;
-};
 
 export type EffectKVS<
   EffectName extends EffectNames,
@@ -60,11 +57,19 @@ type EffectCreator<
     >
   : never;
 
+export type RecordByUnion<Union extends string, U extends Record<Union, any>> = U;
+
+/* Business logic */
+
+export type Event<PayloadSchema extends t.Any> = {
+  timestamp: number;
+  payload: t.TypeOf<PayloadSchema>;
+};
+
 export type EffectNames = 'get' | 'set';
 
-export type RecordByEffectNames<U extends Record<EffectNames, any>> = U;
-
-export type MutationApi = RecordByEffectNames<
+export type MutationApi = RecordByUnion<
+  EffectNames,
   EffectCreator<'get', [string]> & EffectCreator<'set', [string, any]>
 >;
 
