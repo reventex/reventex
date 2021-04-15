@@ -24,27 +24,23 @@ export type TypesOf<T extends ReadonlyArray<t.Any>> = T extends readonly [infer 
   : [];
 
 export type EffectKVS<
-  EffectName extends EffectNames,
+  Type extends EffectTypes,
   Key extends any,
   Value extends any,
-  Specifier extends any
-> = { effectName: EffectName; key: Key; value?: Value; specifier?: Specifier };
+  SliceSize extends any
+> = { type: Type; key: Key; value?: Value; sliceSize?: SliceSize };
 
-export type EffectKV<
-  EffectName extends EffectNames,
-  Key extends any,
-  Value extends any
-> = EffectKVS<EffectName, Key, Value, never>;
-
-export type EffectK<EffectName extends EffectNames, Key extends any> = EffectKVS<
-  EffectName,
+export type EffectKV<Type extends EffectTypes, Key extends any, Value extends any> = EffectKVS<
+  Type,
   Key,
-  never,
+  Value,
   never
 >;
 
+export type EffectK<Type extends EffectTypes, Key extends any> = EffectKVS<Type, Key, never, never>;
+
 type EffectCreator<
-  EffectName extends EffectNames,
+  EffectName extends EffectTypes,
   Args extends [any] | [any, any] | [any, any, any]
 > = Args extends [infer Key]
   ? Record<EffectName, (key: Key) => EffectK<EffectName, Key>>
@@ -66,25 +62,76 @@ export type Event<PayloadSchema extends t.Any> = {
   payload: t.TypeOf<PayloadSchema>;
 };
 
-export type EffectNames = 'get' | 'set';
+export type EffectTypes =
+  | 'set'
+  | 'remove'
+  | 'merge'
+  | 'setMaximum'
+  | 'setMinimum'
+  | 'increment'
+  | 'decrement'
+  | 'multiply'
+  | 'divide'
+  | 'rename'
+  | 'addToSet'
+  | 'pushFront'
+  | 'popFront'
+  | 'pushBack'
+  | 'popBack'
+  | 'pullEQ'
+  | 'pullGT'
+  | 'pullGTE'
+  | 'pullLT'
+  | 'pullLTE'
+  | 'pullNE'
+  | 'pullIN'
+  | 'pullNIN'
+  | 'get';
+
+export type TValue = any;
+export type TStrictKey = Array<string>;
+export type TKey = string | Array<string>;
 
 export type MutationApi = RecordByUnion<
-  EffectNames,
-  EffectCreator<'get', [string]> & EffectCreator<'set', [string, any]>
+  EffectTypes,
+  EffectCreator<'set', [TKey, any]> &
+    EffectCreator<'remove', [TKey]> &
+    EffectCreator<'merge', [TKey, any]> &
+    EffectCreator<'setMaximum', [TKey, number]> &
+    EffectCreator<'setMinimum', [TKey, number]> &
+    EffectCreator<'increment', [TKey, number]> &
+    EffectCreator<'decrement', [TKey, number]> &
+    EffectCreator<'multiply', [TKey, number]> &
+    EffectCreator<'divide', [TKey, number]> &
+    EffectCreator<'rename', [TKey, TKey]> &
+    EffectCreator<'addToSet', [TKey, any]> &
+    EffectCreator<'pushFront', [TKey, any]> &
+    EffectCreator<'popFront', [TKey, any]> &
+    EffectCreator<'pushBack', [TKey, any]> &
+    EffectCreator<'popBack', [TKey, any]> &
+    EffectCreator<'pullEQ', [TKey, any]> &
+    EffectCreator<'pullGT', [TKey, any]> &
+    EffectCreator<'pullGTE', [TKey, any]> &
+    EffectCreator<'pullLT', [TKey, any]> &
+    EffectCreator<'pullLTE', [TKey, any]> &
+    EffectCreator<'pullNE', [TKey, any]> &
+    EffectCreator<'pullIN', [TKey, any]> &
+    EffectCreator<'pullNIN', [TKey, any]> &
+    EffectCreator<'get', [TKey]>
 >;
 
-export const mutationApi: MutationApi = {
-  get(key: string) {
-    return {
-      effectName: 'get',
-      key,
-    };
-  },
-  set(key: string, value: any) {
-    return {
-      effectName: 'set',
-      key,
-      value,
-    };
-  },
-};
+// export const mutationApi: MutationApi = {
+//   get(key) {
+//     return {
+//       type: 'get',
+//       key,
+//     };
+//   },
+//   set(key, value) {
+//     return {
+//       type: 'set',
+//       key,
+//       value,
+//     };
+//   },
+// };
