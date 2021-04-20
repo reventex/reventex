@@ -1,0 +1,32 @@
+name: Master CI/CD
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!*/**'
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.head_ref == 'dev')
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2-beta
+
+      - name: Install
+        run: yarn install --immutable
+
+      - name: Prettier
+        run: yarn prettier:check
+
+      - name: ESLint
+        run: yarn lint
+
+      - name: Unit test
+        run: yarn test
+
+
