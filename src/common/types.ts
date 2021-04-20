@@ -23,44 +23,30 @@ export type TypesOf<T extends ReadonlyArray<t.Any>> = T extends readonly [infer 
     : never
   : [];
 
-export type EffectKVS<
-  Type extends EffectTypes,
-  Key extends any,
-  Value extends any,
-  SliceSize extends any
-> = { type: Type; key: Key; value?: Value; sliceSize?: SliceSize };
-
-export type EffectKV<Type extends EffectTypes, Key extends any, Value extends any> = EffectKVS<
-  Type,
-  Key,
-  Value,
-  never
->;
-
-export type EffectK<Type extends EffectTypes, Key extends any> = EffectKVS<Type, Key, never, never>;
-
-type EffectCreator<
-  EffectName extends EffectTypes,
-  Args extends [any] | [any, any] | [any, any, any]
-> = Args extends [infer Key]
-  ? Record<EffectName, (key: Key) => EffectK<EffectName, Key>>
-  : Args extends [infer Key, infer Value]
-  ? Record<EffectName, (key: Key, value: Value) => EffectKV<EffectName, Key, Value>>
-  : Args extends [infer Key, infer Value, infer Specifier]
-  ? Record<
-      EffectName,
-      (key: Key, value: Value, specifier: Specifier) => EffectKVS<EffectName, Key, Value, Specifier>
-    >
-  : never;
-
 export type RecordByUnion<Union extends string, U extends Record<Union, any>> = U;
 
 /* Business logic */
+
+export type TValue = any;
+export type TStrictKey = Array<string>;
+export type TKey = string;
 
 export type Event<PayloadSchema extends t.Any> = {
   timestamp: number;
   payload: t.TypeOf<PayloadSchema>;
 };
+
+export type Effect<EffectType extends string> = {
+  type: EffectType;
+  key: TStrictKey;
+  value?: TValue;
+  sliceSize?: number;
+};
+
+type EffectCreator<EffectType extends EffectTypes, Args extends Array<any>> = Record<
+  EffectType,
+  (...args: Args) => Effect<EffectType>
+>;
 
 export type EffectTypes =
   | 'set'
@@ -88,50 +74,30 @@ export type EffectTypes =
   | 'pullNIN'
   | 'get';
 
-export type TValue = any;
-export type TStrictKey = Array<string>;
-export type TKey = string | Array<string>;
-
 export type MutationApi = RecordByUnion<
   EffectTypes,
-  EffectCreator<'set', [TKey, any]> &
-    EffectCreator<'remove', [TKey]> &
-    EffectCreator<'merge', [TKey, any]> &
-    EffectCreator<'setMaximum', [TKey, number]> &
-    EffectCreator<'setMinimum', [TKey, number]> &
-    EffectCreator<'increment', [TKey, number]> &
-    EffectCreator<'decrement', [TKey, number]> &
-    EffectCreator<'multiply', [TKey, number]> &
-    EffectCreator<'divide', [TKey, number]> &
-    EffectCreator<'rename', [TKey, TKey]> &
-    EffectCreator<'addToSet', [TKey, any]> &
-    EffectCreator<'pushFront', [TKey, any]> &
-    EffectCreator<'popFront', [TKey, any]> &
-    EffectCreator<'pushBack', [TKey, any]> &
-    EffectCreator<'popBack', [TKey, any]> &
-    EffectCreator<'pullEQ', [TKey, any]> &
-    EffectCreator<'pullGT', [TKey, any]> &
-    EffectCreator<'pullGTE', [TKey, any]> &
-    EffectCreator<'pullLT', [TKey, any]> &
-    EffectCreator<'pullLTE', [TKey, any]> &
-    EffectCreator<'pullNE', [TKey, any]> &
-    EffectCreator<'pullIN', [TKey, any]> &
-    EffectCreator<'pullNIN', [TKey, any]> &
-    EffectCreator<'get', [TKey]>
+  EffectCreator<'set', [string, any] | [any]> &
+    EffectCreator<'remove', [string] | []> &
+    EffectCreator<'merge', [string, any] | [any]> &
+    EffectCreator<'setMaximum', [string, number]> &
+    EffectCreator<'setMinimum', [string, number]> &
+    EffectCreator<'increment', [string, number]> &
+    EffectCreator<'decrement', [string, number]> &
+    EffectCreator<'multiply', [string, number]> &
+    EffectCreator<'divide', [string, number]> &
+    EffectCreator<'rename', [string, string]> &
+    EffectCreator<'addToSet', [string, any]> &
+    EffectCreator<'pushFront', [string, any]> &
+    EffectCreator<'popFront', [string]> &
+    EffectCreator<'pushBack', [string, any]> &
+    EffectCreator<'popBack', [string]> &
+    EffectCreator<'pullEQ', [string, any]> &
+    EffectCreator<'pullGT', [string, any]> &
+    EffectCreator<'pullGTE', [string, any]> &
+    EffectCreator<'pullLT', [string, any]> &
+    EffectCreator<'pullLTE', [string, any]> &
+    EffectCreator<'pullNE', [string, any]> &
+    EffectCreator<'pullIN', [string, any]> &
+    EffectCreator<'pullNIN', [string, any]> &
+    EffectCreator<'get', [string] | []>
 >;
-
-// export const mutationApi: MutationApi = {
-//   get(key) {
-//     return {
-//       type: 'get',
-//       key,
-//     };
-//   },
-//   set(key, value) {
-//     return {
-//       type: 'set',
-//       key,
-//       value,
-//     };
-//   },
-// };

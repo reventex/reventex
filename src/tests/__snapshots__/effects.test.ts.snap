@@ -1,0 +1,578 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`works correctly addToSet("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "addToSet",
+  "value": 10,
+}
+`;
+
+exports[`works correctly addToSet("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "addToSet",
+  "value": 10,
+}
+`;
+
+exports[`works correctly decrement("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "decrement",
+  "value": 10,
+}
+`;
+
+exports[`works correctly decrement("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "decrement",
+  "value": 10,
+}
+`;
+
+exports[`works correctly divide("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "divide",
+  "value": 10,
+}
+`;
+
+exports[`works correctly divide("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "divide",
+  "value": 10,
+}
+`;
+
+exports[`works correctly get("a") 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "get",
+}
+`;
+
+exports[`works correctly get("a.b") 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "get",
+}
+`;
+
+exports[`works correctly get() 1`] = `
+Object {
+  "key": Array [],
+  "type": "get",
+}
+`;
+
+exports[`works correctly increment("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "increment",
+  "value": 10,
+}
+`;
+
+exports[`works correctly increment("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "increment",
+  "value": 10,
+}
+`;
+
+exports[`works correctly merge("a", {}) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "merge",
+  "value": Object {},
+}
+`;
+
+exports[`works correctly merge("a.b", {}) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "merge",
+  "value": Object {},
+}
+`;
+
+exports[`works correctly merge({}) 1`] = `
+Object {
+  "key": Array [],
+  "type": "merge",
+  "value": Object {},
+}
+`;
+
+exports[`works correctly multiply("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "multiply",
+  "value": 10,
+}
+`;
+
+exports[`works correctly multiply("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "multiply",
+  "value": 10,
+}
+`;
+
+exports[`works correctly popBack("a") 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "popBack",
+}
+`;
+
+exports[`works correctly popBack("a.b") 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "popBack",
+}
+`;
+
+exports[`works correctly popFront("a") 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "popFront",
+}
+`;
+
+exports[`works correctly popFront("a.b") 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "popFront",
+}
+`;
+
+exports[`works correctly pullEQ("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "pullEQ",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullEQ("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "pullEQ",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullGT("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "pullGT",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullGT("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "pullGT",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullGTE("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "pullGTE",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullGTE("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "pullGTE",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullIN("a", [10,20,30]) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "pullIN",
+  "value": Array [
+    10,
+    20,
+    30,
+  ],
+}
+`;
+
+exports[`works correctly pullIN("a.b", [10,20,30]) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "pullIN",
+  "value": Array [
+    10,
+    20,
+    30,
+  ],
+}
+`;
+
+exports[`works correctly pullLT("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "pullLT",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullLT("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "pullLT",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullLTE("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "pullLTE",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullLTE("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "pullLTE",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullNE("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "pullNE",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullNE("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "pullNE",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pullNIN("a", [10,20,30]) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "pullNIN",
+  "value": Array [
+    10,
+    20,
+    30,
+  ],
+}
+`;
+
+exports[`works correctly pullNIN("a.b", [10,20,30]) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "pullNIN",
+  "value": Array [
+    10,
+    20,
+    30,
+  ],
+}
+`;
+
+exports[`works correctly pushBack("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "sliceSize": undefined,
+  "type": "pushBack",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pushBack("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "sliceSize": undefined,
+  "type": "pushBack",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pushFront("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "sliceSize": undefined,
+  "type": "pushFront",
+  "value": 10,
+}
+`;
+
+exports[`works correctly pushFront("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "sliceSize": undefined,
+  "type": "pushFront",
+  "value": 10,
+}
+`;
+
+exports[`works correctly remove("a") 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "remove",
+}
+`;
+
+exports[`works correctly remove("a.b") 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "remove",
+}
+`;
+
+exports[`works correctly remove() 1`] = `
+Object {
+  "key": Array [],
+  "type": "remove",
+}
+`;
+
+exports[`works correctly rename("a", "b") 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "rename",
+  "value": Array [
+    "b",
+  ],
+}
+`;
+
+exports[`works correctly rename("a", "b.c") 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "rename",
+  "value": Array [
+    "b",
+    "c",
+  ],
+}
+`;
+
+exports[`works correctly rename("a.b", "b") 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "rename",
+  "value": Array [
+    "b",
+  ],
+}
+`;
+
+exports[`works correctly rename("a.b", "b.c") 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "rename",
+  "value": Array [
+    "b",
+    "c",
+  ],
+}
+`;
+
+exports[`works correctly set("a", "a") 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "set",
+  "value": "a",
+}
+`;
+
+exports[`works correctly set("a.b", "a") 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "set",
+  "value": "a",
+}
+`;
+
+exports[`works correctly set({}) 1`] = `
+Object {
+  "key": Array [],
+  "type": "set",
+  "value": Object {},
+}
+`;
+
+exports[`works correctly setMaximum("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "setMaximum",
+  "value": 10,
+}
+`;
+
+exports[`works correctly setMaximum("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "setMaximum",
+  "value": 10,
+}
+`;
+
+exports[`works correctly setMinimum("a", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+  ],
+  "type": "setMinimum",
+  "value": 10,
+}
+`;
+
+exports[`works correctly setMinimum("a.b", 10) 1`] = `
+Object {
+  "key": Array [
+    "a",
+    "b",
+  ],
+  "type": "setMinimum",
+  "value": 10,
+}
+`;
