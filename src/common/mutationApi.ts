@@ -102,7 +102,7 @@ export const mutationApi: MutationApi = {
     const [key] = normalizeArgsK(args);
     return {
       type: 'popFront',
-      key
+      key,
     };
   },
   pushBack(...args) {

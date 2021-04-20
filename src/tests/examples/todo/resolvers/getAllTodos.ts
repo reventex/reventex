@@ -1,4 +1,4 @@
-import { t, resolver } from '../../../common';
+import { t, resolver } from '../../../../common';
 
 export default resolver('getAllUsers')
   .withArgs()

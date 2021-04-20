@@ -6,7 +6,7 @@ import {
   NarrowableString,
   UnionOfTuple,
   ExcludeFromTuple,
-  EffectKVS,
+  Effect,
   EffectTypes,
 } from './types';
 import { Events } from './events';
@@ -35,7 +35,7 @@ export class Projection<
     handler: (
       event: Event<PayloadSchemas[EventType]>,
       api: MutationApi,
-    ) => Generator<EffectKVS<EffectTypes, any, any, any>, void, unknown>,
+    ) => Generator<Effect<EffectTypes>, void, unknown>,
   ): Projection<ProjectionName, PayloadSchemas, ExcludeFromTuple<EventTypes, EventType>> {
     return new Projection<any, any, any>(this.name, this.events, {
       ...this.handlers,

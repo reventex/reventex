@@ -1,4 +1,4 @@
-import { t, events } from '../../common';
+import { t, events } from '../../../common';
 
 export default events()
   .define('TODO_ADDED', t.type({ text: t.string }))

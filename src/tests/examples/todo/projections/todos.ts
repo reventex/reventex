@@ -1,4 +1,4 @@
-import { projection } from '../../../common';
+import { projection } from '../../../../common';
 import events from '../events';
 
 export default projection('todos', events)
