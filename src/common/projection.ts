@@ -23,7 +23,7 @@ export class Projection<
   constructor(
     name: ProjectionName,
     events: Events<PayloadSchemas, EventTypes>,
-    handlers: Record<UnionOfTuple<EventTypes>, any> = {} as any,
+    handlers: Record<UnionOfTuple<EventTypes>, any> = {} as any
   ) {
     this.name = name;
     this.events = events;
@@ -34,8 +34,8 @@ export class Projection<
     eventType: EventType,
     handler: (
       event: Event<PayloadSchemas[EventType]>,
-      api: MutationApi,
-    ) => Generator<Effect<EffectTypes>, void, unknown>,
+      api: MutationApi
+    ) => Generator<Effect<EffectTypes>, void, unknown>
   ): Projection<ProjectionName, PayloadSchemas, ExcludeFromTuple<EventTypes, EventType>> {
     return new Projection<any, any, any>(this.name, this.events, {
       ...this.handlers,
@@ -50,7 +50,7 @@ export function projection<
   EventTypes extends ReadonlyArray<NarrowableString>
 >(
   name: ProjectionName,
-  events: Events<PayloadSchemas, EventTypes>,
+  events: Events<PayloadSchemas, EventTypes>
 ): Projection<ProjectionName, PayloadSchemas, EventTypes> {
   return new Projection<ProjectionName, PayloadSchemas, EventTypes>(name, events);
 }

@@ -16,7 +16,7 @@ export class Resolver<
     name: ResolverName,
     inputSchema: Args,
     outputSchema: Result,
-    implementation: (...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>,
+    implementation: (...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>
   ) {
     this.name = name;
     this.inputSchema = inputSchema;
@@ -36,7 +36,7 @@ export function resolver<ResolverName extends NarrowableString>(name: ResolverNa
                 name,
                 inputSchemas,
                 outputSchema,
-                implementation,
+                implementation
               );
             },
           };

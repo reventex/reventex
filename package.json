@@ -8,8 +8,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "tsc --noEmit &&  eslint .",
-    "prettier": "prettier ./src/**/*.ts --write --trailing-comma=all --single-quote --semi --bracket-spacing --tab-width=2",
-    "prettier:check": "if [ \"$(prettier ./src/**/*.ts --list-different --trailing-comma=all --single-quote --semi --bracket-spacing --tab-width=2)\" ]; then exit 1; fi"
+    "prettier": "prettier ./src/**/*.ts --write",
+    "prettier:check": "prettier ./src/**/*.ts --check"
   },
   "repository": {
     "type": "git",

@@ -15,7 +15,7 @@ export class Events<
 
   define<EventType extends NarrowableString, PayloadSchema extends t.Type<any>>(
     eventType: EventType,
-    payloadSchema: PayloadSchema,
+    payloadSchema: PayloadSchema
   ): Events<
     PayloadSchemas & Record<EventType, PayloadSchema>,
     readonly [...EventTypes, EventType]
