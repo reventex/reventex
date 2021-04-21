@@ -7,7 +7,7 @@ on:
       - '!*/**'
 
 jobs:
-  smoke-test:
+  workflow:
     runs-on: ubuntu-latest
 
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.head_ref == 'dev')
@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/setup-node@v2
 
       - name: Install
         run: |
