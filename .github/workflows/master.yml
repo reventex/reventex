@@ -18,7 +18,9 @@ jobs:
       - uses: actions/setup-node@v2-beta
 
       - name: Install
-        run: yarn install --immutable
+        run: |
+          yarn set version berry
+          yarn install --immutable
 
       - name: Prettier
         run: yarn prettier:check
