@@ -1,4 +1,5 @@
 import * as t from 'io-ts';
+import { ClientSession, Collection, ObjectId } from 'mongodb';
 
 /* Helpers */
 
@@ -36,7 +37,7 @@ export type Event<PayloadSchema extends t.Any> = {
   payload: t.TypeOf<PayloadSchema>;
 };
 
-export type Effect<EffectType extends string> = {
+export type Effect<EffectType extends EffectTypes> = {
   type: EffectType;
   key: TStrictKey;
   value?: TValue;
@@ -101,3 +102,11 @@ export type MutationApi = RecordByUnion<
     EffectCreator<'pullNIN', [string, any]> &
     EffectCreator<'get', [string] | []>
 >;
+
+export type ImmutableContext = { state: any };
+
+export type MongoContext = {
+  session: ClientSession;
+  collection: Collection;
+  documentId: ObjectId;
+};

@@ -1,4 +1,4 @@
-import { mutationApi } from '../common/mutationApi';
+import { mutationApi } from '../common/mutation-api';
 
 const {
   addToSet,

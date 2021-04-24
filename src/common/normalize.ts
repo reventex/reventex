@@ -1,5 +1,5 @@
 import { TKey, TStrictKey, TValue } from './types';
-import { prepareKey } from './prepareKey';
+import { prepareKey } from './prepare-key';
 
 export const normalizeArgsKVS = (args: Array<any>): [TStrictKey, TValue, number | undefined] => {
   switch (args.length) {
