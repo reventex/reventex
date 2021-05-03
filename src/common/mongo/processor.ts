@@ -4,7 +4,7 @@ export async function processor(context: MongoContext, effect: Effect<EffectType
   const { session, collection, documentId } = context;
   const { type, key, value, sliceSize } = effect;
   // TODO
-  void sliceSize
+  void sliceSize;
 
   switch (type) {
     case 'set': {
@@ -51,8 +51,8 @@ export async function processor(context: MongoContext, effect: Effect<EffectType
     }
     case 'merge': {
       const $set: { [key: string]: TValue } = {};
-      for (let kv in value) {
-        if (!value.hasOwnProperty(kv)) {
+      for (const kv in value) {
+        if (!Object.prototype.hasOwnProperty.call(value, kv)) {
           continue;
         }
         $set[[...key, kv].join('.')] = value[kv];
@@ -140,12 +140,11 @@ export async function processor(context: MongoContext, effect: Effect<EffectType
       break;
     }
     case 'rename': {
-      const newKey = value;
       await collection.updateOne(
         { _id: documentId },
         {
           $rename: {
-            [key.join('.')]: [].concat(newKey).join('.'),
+            [key.join('.')]: [].concat(value).join('.'),
           },
         },
         { session, upsert: true }
@@ -375,7 +374,7 @@ export async function processor(context: MongoContext, effect: Effect<EffectType
         if (pointer == null) {
           return undefined;
         }
-        const pointerKey: any = key[index]
+        const pointerKey: any = key[index];
         pointer = pointer[pointerKey];
       }
 

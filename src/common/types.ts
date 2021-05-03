@@ -22,6 +22,8 @@ export type TypesOf<T extends ReadonlyArray<t.Any>> = T extends readonly [infer 
       ? readonly [t.TypeOf<F>, ...TypesOf<R>]
       : never
     : never
+  : T extends Array<any>
+  ? Array<any>
   : [];
 
 export type RecordByUnion<Union extends string, U extends Record<Union, any>> = U;
@@ -34,7 +36,19 @@ export type TKey = string;
 
 export type Event<PayloadSchema extends t.Any> = {
   timestamp: number;
+  type: string;
   payload: t.TypeOf<PayloadSchema>;
+};
+
+export type EventFromClient = {
+  type: string;
+  payload: any;
+};
+
+export type EventFromDatabase = {
+  timestamp: number;
+  type: string;
+  payload: any;
 };
 
 export type Effect<EffectType extends EffectTypes> = {
@@ -110,3 +124,13 @@ export type MongoContext = {
   collection: Collection;
   documentId: ObjectId;
 };
+
+export type EventHandler<
+  PayloadSchemas extends Record<UnionOfTuple<EventTypes>, t.Type<any>>,
+  EventTypes extends ReadonlyArray<NarrowableString>,
+  EventType extends UnionOfTuple<EventTypes>
+> = (context: {
+  event: Event<PayloadSchemas[EventType]>;
+  api: MutationApi;
+  documentId: string;
+}) => Generator<Effect<EffectTypes>, void, unknown>;

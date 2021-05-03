@@ -1,14 +1,8 @@
 import * as t from 'io-ts';
 
-import {
-  Event,
-  MutationApi,
-  NarrowableString,
-  UnionOfTuple,
-  ExcludeFromTuple,
-  Effect,
-  EffectTypes,
-} from './types';
+import { IndexDirection } from 'mongodb';
+
+import { NarrowableString, UnionOfTuple, ExcludeFromTuple, EventHandler } from './types';
 import { Events } from './events';
 
 export class Projection<
@@ -18,7 +12,11 @@ export class Projection<
 > {
   readonly name: ProjectionName;
   readonly events: Events<PayloadSchemas, EventTypes>;
-  readonly handlers: Record<UnionOfTuple<EventTypes>, any>;
+  readonly handlers: Record<
+    UnionOfTuple<EventTypes>,
+    EventHandler<PayloadSchemas, EventTypes, any>
+  >;
+  readonly indexes: Array<[string, IndexDirection]> = [];
 
   constructor(
     name: ProjectionName,
@@ -30,17 +28,19 @@ export class Projection<
     this.handlers = handlers;
   }
 
+  index(
+    indexSpec: [string, IndexDirection]
+  ): Projection<ProjectionName, PayloadSchemas, EventTypes> {
+    this.indexes.push(indexSpec);
+    return this;
+  }
+
   on<EventType extends UnionOfTuple<EventTypes>>(
     eventType: EventType,
-    handler: (
-      event: Event<PayloadSchemas[EventType]>,
-      api: MutationApi
-    ) => Generator<Effect<EffectTypes>, void, unknown>
+    handler: EventHandler<PayloadSchemas, EventTypes, EventType>
   ): Projection<ProjectionName, PayloadSchemas, ExcludeFromTuple<EventTypes, EventType>> {
-    return new Projection<any, any, any>(this.name, this.events, {
-      ...this.handlers,
-      [eventType]: handler,
-    });
+    this.handlers[eventType] = handler;
+    return this as any;
   }
 }
 

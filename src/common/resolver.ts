@@ -1,6 +1,12 @@
 import * as t from 'io-ts';
+import { Db, ClientSession } from 'mongodb';
 
 import { NarrowableString, TypesOf } from './types';
+
+type ResolveApi = {
+  database: Db;
+  session: ClientSession;
+};
 
 export class Resolver<
   ResolverName extends NarrowableString,
@@ -10,13 +16,13 @@ export class Resolver<
   name: ResolverName;
   inputSchema: Args;
   outputSchema: Result;
-  implementation: (...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>;
+  implementation: (api: ResolveApi, ...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>;
 
   constructor(
     name: ResolverName,
     inputSchema: Args,
     outputSchema: Result,
-    implementation: (...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>
+    implementation: (api: ResolveApi, ...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>
   ) {
     this.name = name;
     this.inputSchema = inputSchema;
@@ -31,7 +37,9 @@ export function resolver<ResolverName extends NarrowableString>(name: ResolverNa
       return {
         returns<Result extends t.Any>(outputSchema: Result) {
           return {
-            implements(implementation: (...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>) {
+            implements(
+              implementation: (api: ResolveApi, ...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>
+            ) {
               return new Resolver<ResolverName, Args, Result>(
                 name,
                 inputSchemas,
