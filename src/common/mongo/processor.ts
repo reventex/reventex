@@ -1,4 +1,5 @@
 import { TValue, MongoContext, Effect, EffectTypes } from '../types';
+import { Projection } from 'mongodb';
 
 export async function processor(context: MongoContext, effect: Effect<EffectTypes>) {
   const { session, collection, documentId } = context;
@@ -354,7 +355,7 @@ export async function processor(context: MongoContext, effect: Effect<EffectType
     case 'get': {
       const keyLength = key.length;
 
-      const projection =
+      const projection: Projection<any> =
         keyLength === 0
           ? { _id: 0, _version: 0 }
           : {

@@ -1,16 +1,10 @@
-import {
-  ObjectId,
-  MongoClient,
-  ClientSessionOptions,
-  ClientSession,
-  Collection,
-  ReadConcern,
-  WriteConcern,
-} from 'mongodb';
+import { ObjectId, MongoClient, ClientSessionOptions, ClientSession, Collection } from 'mongodb';
+import * as t from 'io-ts';
 
 import { PRIVATE } from './constants';
-import { EventFromDatabase, EventFromClient } from './types';
+import { EventFromDatabase, EventFromClient, UnionOfTuple, NarrowableString } from './types';
 import { extractEntityIdsFromEvent } from './extract-entity-ids-from-event';
+import { Events } from './events';
 import { Projection } from './projection';
 import { Resolver } from './resolver';
 import { EntityId, EntityIdWithDocumentVersion } from './entity-id';
@@ -19,14 +13,14 @@ import { mutationApi } from './mutation-api';
 
 const sessionOptions: ClientSessionOptions = {
   causalConsistency: true,
-  defaultTransactionOptions: {
-    readConcern: ReadConcern.fromOptions({ level: 'snapshot' }),
-    writeConcern: WriteConcern.fromOptions({ w: 'majority', wtimeout: 30000, j: true }),
-  },
+  // defaultTransactionOptions: {
+  //   //readConcern: ReadConcern('snapshot'),
+  //  // writeConcern: WriteConcern.fromOptions({ w: 'majority', wtimeout: 30000, j: true }),
+  // },
 };
 
 function checkRequiredFields<A extends Array<any>, B extends any>(
-  domain: Domain<Array<Projection<any, any, any>>, Map<string, Resolver<string, Array<any>, any>>>,
+  domain: Domain<any, any, any, any, any>,
   method: (...args: A) => B
 ) {
   return function wrappedMethod(...args: A): B {
@@ -36,18 +30,34 @@ function checkRequiredFields<A extends Array<any>, B extends any>(
     if (domain[PRIVATE].eventStoreMetaCollectionName == null) {
       throw new Error('Event store meta is required');
     }
-    if (domain[PRIVATE].databaseName == null) {
-      throw new Error('Database name is required');
-    }
+    // if (domain[PRIVATE].databaseName == null) {
+    //   throw new Error('Database name is required');
+    // }
     return method.apply(domain, args);
   };
 }
 
+function ignoreAlreadyExists(error: Error & { code?: number }) {
+  if (error?.code !== 48) {
+    throw error;
+  }
+}
+
+function ignoreNotExists(error: Error & { code?: number }) {
+  if (error?.code !== 26) {
+    throw error;
+  }
+}
+
 export class Domain<
-  Projections extends Array<Projection<any, any, any>>,
+  EventStoreCollectionName extends string,
+  PayloadSchemas extends Record<UnionOfTuple<EventTypes>, t.Type<any>>,
+  EventTypes extends ReadonlyArray<NarrowableString>,
+  Projections extends Array<Projection<EventStoreCollectionName, any, any, any>>,
   Resolvers extends Map<string, Resolver<string, Array<any>, any>>
 > {
   [PRIVATE]: {
+    events: Events<EventStoreCollectionName, PayloadSchemas, EventTypes>;
     projections: Projections;
     resolvers: Resolvers;
     databaseName: string;
@@ -59,16 +69,18 @@ export class Domain<
     builderSession: Promise<ClientSession>;
   };
 
-  constructor() {
+  constructor(events: Events<EventStoreCollectionName, PayloadSchemas, EventTypes>) {
     Object.defineProperty(this, PRIVATE, {
       value: {
+        events,
         projections: [],
         sideEffects: [],
         resolvers: new Map(),
         documentId: ObjectId,
+        eventStoreCollectionName: events.collectionName,
+        eventStoreMetaCollectionName: `${events.collectionName}-meta`,
       },
     });
-
     this.publish = checkRequiredFields(this, this.publish);
     this.build = checkRequiredFields(this, this.build);
     this.drop = checkRequiredFields(this, this.drop);
@@ -94,7 +106,7 @@ export class Domain<
 
     return this;
   }
-  projections(projections: Array<Projection<any, any, any>>) {
+  projections(projections: Array<Projection<any, any, any, any>>) {
     this[PRIVATE].projections.push(...projections);
     return this;
   }
@@ -105,16 +117,7 @@ export class Domain<
     }
     return this;
   }
-  eventStore(eventStoreCollectionName: string) {
-    this[PRIVATE].eventStoreCollectionName = eventStoreCollectionName;
-    this[PRIVATE].eventStoreMetaCollectionName = `${eventStoreCollectionName}-meta`;
-    return this;
-  }
-  database(databaseName: string) {
-    this[PRIVATE].databaseName = databaseName;
-    return this;
-  }
-  async build() {
+  async init() {
     const {
       builderClient,
       builderSession,
@@ -130,12 +133,16 @@ export class Domain<
     const collectionPromises: Array<Promise<any>> = [];
 
     collectionPromises.push(
-      database.createCollection(eventStoreCollectionName, { session }),
-      database.createCollection(eventStoreMetaCollectionName, { session })
+      database.createCollection(eventStoreCollectionName, { session }).catch(ignoreAlreadyExists),
+      database
+        .createCollection(eventStoreMetaCollectionName, { session })
+        .catch(ignoreAlreadyExists)
     );
 
     for (const { name } of projections) {
-      collectionPromises.push(database.createCollection(name, { session }));
+      collectionPromises.push(
+        database.createCollection(name, { session }).catch(ignoreAlreadyExists)
+      );
     }
 
     await Promise.all(collectionPromises);
@@ -176,6 +183,16 @@ export class Domain<
     }
 
     await Promise.all(indexPromises);
+  }
+
+  async build() {
+    const { builderClient, builderSession, databaseName, eventStoreCollectionName, projections } =
+      this[PRIVATE];
+
+    const database = await (await builderClient).db(databaseName);
+    const session = await builderSession;
+
+    const eventStore = database.collection(eventStoreCollectionName);
 
     const countProjections = projections.length;
 
@@ -264,23 +281,16 @@ export class Domain<
     }
 
     for (const collection of collections) {
-      databasePromises.push(
-        collection.drop({ session }).catch(function (error: Error & { code?: number }) {
-          if (error.code != 26) {
-            throw error;
-          }
-        })
-      );
+      databasePromises.push(collection.drop({ session }).catch(ignoreNotExists));
     }
 
     await Promise.all(databasePromises);
   }
-  async publish(events: Array<EventFromClient>) {
+  async publish(events: Array<EventFromClient<EventTypes, PayloadSchemas>>) {
     const {
       projections,
       builderClient,
       builderSession,
-      databaseName,
       eventStoreCollectionName,
       eventStoreMetaCollectionName,
     } = this[PRIVATE];
@@ -291,7 +301,7 @@ export class Domain<
     const session = await builderSession;
 
     await session.startTransaction();
-    const database = await (await builderClient).db(databaseName);
+    const database = await (await builderClient).db();
 
     const eventStore = database.collection(eventStoreCollectionName);
     const eventStoreMeta = database.collection(eventStoreMetaCollectionName);
@@ -445,9 +455,11 @@ export class Domain<
     }
   }
   async close() {
-    const { builderClient, resolverClient } = this[PRIVATE];
+    const { builderClient, resolverClient, builderSession, resolverSession } = this[PRIVATE];
+    await (await builderSession).endSession();
     await (await builderClient).close();
     if (builderClient !== resolverClient) {
+      await (await resolverSession).endSession();
       await (await resolverClient).close();
     }
   }
@@ -465,21 +477,23 @@ export class Domain<
   }
 }
 
-export const domain = {
+export const domain = <
+  EventStoreCollectionName extends string,
+  PayloadSchemas extends Record<UnionOfTuple<EventTypes>, t.Type<any>>,
+  EventTypes extends ReadonlyArray<NarrowableString>
+>(
+  events: Events<EventStoreCollectionName, PayloadSchemas, EventTypes>
+) => ({
   connect(builderClient: Promise<MongoClient>, resolverClient?: Promise<MongoClient>) {
-    const instance = new Domain();
+    const instance = new Domain(events);
     return instance.connect(builderClient, resolverClient);
   },
-  projections(projections: Array<Projection<any, any, any>>) {
-    const instance = new Domain();
+  projections(projections: Array<Projection<any, any, any, any>>) {
+    const instance = new Domain(events);
     return instance.projections(projections);
   },
-  eventStore(eventStoreCollectionName: string) {
-    const instance = new Domain();
-    return instance.eventStore(eventStoreCollectionName);
-  },
   resolvers(resolvers: Array<Resolver<any, any, any>>) {
-    const instance = new Domain();
+    const instance = new Domain(events);
     return instance.resolvers(resolvers);
   },
-};
+});

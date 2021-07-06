@@ -40,10 +40,14 @@ export type Event<PayloadSchema extends t.Any> = {
   payload: t.TypeOf<PayloadSchema>;
 };
 
-export type EventFromClient = {
-  type: string;
-  payload: any;
-};
+export type EventFromClient<
+  EventTypes extends ReadonlyArray<string>,
+  PayloadSchemas extends Record<UnionOfTuple<EventTypes>, t.Type<any>>
+> = {
+  [K in keyof PayloadSchemas]: K extends string
+    ? { type: K; payload: t.TypeOf<PayloadSchemas[K]> }
+    : never;
+}[keyof PayloadSchemas];
 
 export type EventFromDatabase = {
   timestamp: number;

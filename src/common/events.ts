@@ -1,14 +1,26 @@
 import * as t from 'io-ts';
+
 import { NarrowableString, UnionOfTuple } from './types';
 
 export class Events<
+  Entities extends [''] | ReadonlyArray<string>,
+  EventStoreCollectionName extends string,
   PayloadSchemas extends Record<UnionOfTuple<EventTypes>, t.Type<any>>,
-  EventTypes extends ReadonlyArray<NarrowableString>
+  EventTypes extends ReadonlyArray<string>
 > {
+  readonly entities: Entities;
+  readonly collectionName: EventStoreCollectionName;
   readonly payloadSchemas: PayloadSchemas;
   readonly eventTypes: EventTypes;
 
-  constructor(payloadSchemas: PayloadSchemas, eventTypes: EventTypes) {
+  constructor(
+    entities: Entities,
+    collectionName: EventStoreCollectionName,
+    payloadSchemas: PayloadSchemas,
+    eventTypes: EventTypes
+  ) {
+    this.entities = entities;
+    this.collectionName = collectionName;
     this.payloadSchemas = payloadSchemas;
     this.eventTypes = eventTypes;
   }
@@ -17,14 +29,21 @@ export class Events<
     eventType: EventType,
     payloadSchema: PayloadSchema
   ): Events<
+    Entities,
+    EventStoreCollectionName,
     PayloadSchemas & Record<EventType, PayloadSchema>,
     readonly [...EventTypes, EventType]
   > {
-    return new Events<any, any>({ ...this.payloadSchemas, [eventType]: payloadSchema }, [
-      ...this.eventTypes,
-      eventType,
-    ]);
+    (this.payloadSchemas as any)[eventType] = payloadSchema;
+    (this.eventTypes as any).push(eventType);
+    return this as any;
   }
 }
 
-export const events = () => new Events({} as const, [] as const);
+export const events = <
+  EventStoreCollectionName extends string,
+  Entities extends [''] | ReadonlyArray<string>
+>(
+  collectionName: EventStoreCollectionName,
+  entities: Entities
+) => new Events(entities, collectionName, {} as const, [] as const);

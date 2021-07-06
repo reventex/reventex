@@ -1,6 +1,6 @@
-import { t, events } from '../../../common';
+import { t, events } from '../../../server';
 
-export default events()
+export default events('events', ['todos', 'users'])
   .define('TODO_ADDED', t.type({ text: t.string }))
   .define('TODO_TOGGLED', t.void)
   .define('TODO_DELETED', t.void)
