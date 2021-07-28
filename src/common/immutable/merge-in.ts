@@ -21,9 +21,7 @@ export function mergeIn(context: ImmutableContext, key: TStrictKey, value: TValu
   for (const valueKey in value) {
     if (Object.prototype.hasOwnProperty.call(value, valueKey)) {
       if (Object(pointer) !== pointer || (isArray && !isNonNegativeInteger(valueKey))) {
-        throw new Error(
-          `Cannot create field ${JSON.stringify(valueKey)} in element ${JSON.stringify(pointer)}`
-        );
+        throw new Error(`Cannot create field ${JSON.stringify(valueKey)} in element ${JSON.stringify(pointer)}`);
       }
       const subValue = value[valueKey];
       pointer[valueKey] = subValue == null ? null : subValue;

@@ -21,11 +21,11 @@ function createDocumentId(): string {
 
 const validateRegExp = /^[0-9A-F]{24}$/i;
 
-export class EntityId {
-  entityName: string;
+export class EntityId<EntityName extends string = string> {
+  entityName: EntityName;
   documentId: string;
 
-  constructor(entityName: string, documentId: string) {
+  constructor(entityName: EntityName, documentId: string) {
     if (entityName == null || entityName.constructor !== String) {
       throw new Error('Argument "entityName" must be a string');
     }
@@ -34,11 +34,7 @@ export class EntityId {
       throw new Error('Argument "documentId" must be a string"');
     }
     if (!validateRegExp.test(documentId)) {
-      throw new Error(
-        `Incorrect argument "documentId" = ${JSON.stringify(
-          documentId
-        )}. RegExp = ${validateRegExp}`
-      );
+      throw new Error(`Incorrect argument "documentId" = ${JSON.stringify(documentId)}. RegExp = ${validateRegExp}`);
     }
 
     this.entityName = entityName;
@@ -46,12 +42,12 @@ export class EntityId {
   }
 }
 
-export class EntityIdWithDocumentVersion {
-  entityName: string;
+export class EntityIdWithDocumentVersion<EntityName extends string = string> {
+  entityName: EntityName;
   documentId: string;
   documentVersion: number;
 
-  constructor(entityId: EntityId, documentVersion: number) {
+  constructor(entityId: EntityId<EntityName>, documentVersion: number) {
     this.entityName = entityId.entityName;
     this.documentId = entityId.documentId;
     this.documentVersion = documentVersion;
@@ -61,10 +57,7 @@ export class EntityIdWithDocumentVersion {
     return new EntityId(this.entityName, this.documentId);
   }
 
-  static fromEntityId(
-    entityId?: EntityId,
-    documentVersion?: number
-  ): EntityIdWithDocumentVersion | null {
+  static fromEntityId(entityId?: EntityId, documentVersion?: number): EntityIdWithDocumentVersion | null {
     if (entityId != null && documentVersion != null) {
       return new EntityIdWithDocumentVersion(entityId, documentVersion);
     } else {
@@ -73,5 +66,5 @@ export class EntityIdWithDocumentVersion {
   }
 }
 
-export const entityId = (entityName: string, documentId: string = createDocumentId()) =>
-  new EntityId(entityName, documentId);
+export const entityId = <EntityName extends string>(entityName: EntityName, documentId: string = createDocumentId()) =>
+  new EntityId<EntityName>(entityName, documentId);

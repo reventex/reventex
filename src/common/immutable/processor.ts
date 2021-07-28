@@ -13,10 +13,7 @@ import { mergeIn } from './merge-in';
 import { pullWithCompare } from './pull-with-compare';
 import { validateRenameKey } from './validate-rename-key';
 
-export function processor<EffectType extends EffectTypes>(
-  context: ImmutableContext,
-  effect: Effect<EffectType>
-) {
+export function processor<EffectType extends EffectTypes>(context: ImmutableContext, effect: Effect<EffectType>) {
   const { type, key, value, sliceSize } = effect;
   // TODO
   void sliceSize;
@@ -56,11 +53,7 @@ export function processor<EffectType extends EffectTypes>(
     case 'setMaximum': {
       const prevValue = getIn(context, key);
 
-      if (
-        (value === null && prevValue === undefined) ||
-        prevValue == null ||
-        (value > prevValue && value !== null)
-      ) {
+      if ((value === null && prevValue === undefined) || prevValue == null || (value > prevValue && value !== null)) {
         immutableClone(context, key, true);
 
         setIn(context, key, value);
@@ -83,11 +76,7 @@ export function processor<EffectType extends EffectTypes>(
     }
     case 'increment': {
       if (value !== Number(value)) {
-        throw new Error(
-          `Cannot increment with non-numeric argument: { ${key.join('.')}: ${JSON.stringify(
-            value
-          )} }`
-        );
+        throw new Error(`Cannot increment with non-numeric argument: { ${key.join('.')}: ${JSON.stringify(value)} }`);
       }
 
       let prevValue = getIn(context, key);
@@ -99,9 +88,7 @@ export function processor<EffectType extends EffectTypes>(
         throw new Error(
           `Cannot apply $inc to a value of non-numeric type. ${JSON.stringify(
             context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-numeric type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          )} has the field ${JSON.stringify(key.join('.'))} of non-numeric type ${JSON.stringify(typeof prevValue)}`
         );
       }
 
@@ -114,11 +101,7 @@ export function processor<EffectType extends EffectTypes>(
     }
     case 'decrement': {
       if (value !== Number(value)) {
-        throw new Error(
-          `Cannot increment with non-numeric argument: { ${key.join('.')}: ${JSON.stringify(
-            value
-          )} }`
-        );
+        throw new Error(`Cannot increment with non-numeric argument: { ${key.join('.')}: ${JSON.stringify(value)} }`);
       }
 
       let prevValue = getIn(context, key);
@@ -130,9 +113,7 @@ export function processor<EffectType extends EffectTypes>(
         throw new Error(
           `Cannot apply $inc to a value of non-numeric type. ${JSON.stringify(
             context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-numeric type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          )} has the field ${JSON.stringify(key.join('.'))} of non-numeric type ${JSON.stringify(typeof prevValue)}`
         );
       }
 
@@ -145,11 +126,7 @@ export function processor<EffectType extends EffectTypes>(
     }
     case 'multiply': {
       if (value !== Number(value)) {
-        throw new Error(
-          `Cannot multiply with non-numeric argument: { ${key.join('.')}: ${JSON.stringify(
-            value
-          )} }`
-        );
+        throw new Error(`Cannot multiply with non-numeric argument: { ${key.join('.')}: ${JSON.stringify(value)} }`);
       }
 
       let prevValue = getIn(context, key);
@@ -161,9 +138,7 @@ export function processor<EffectType extends EffectTypes>(
         throw new Error(
           `Cannot apply $mul to a value of non-numeric type. ${JSON.stringify(
             context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-numeric type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          )} has the field ${JSON.stringify(key.join('.'))} of non-numeric type ${JSON.stringify(typeof prevValue)}`
         );
       }
 
@@ -176,11 +151,7 @@ export function processor<EffectType extends EffectTypes>(
     }
     case 'divide': {
       if (value !== Number(value)) {
-        throw new Error(
-          `Cannot increment with non-numeric argument: { ${key.join('.')}: ${JSON.stringify(
-            value
-          )} }`
-        );
+        throw new Error(`Cannot increment with non-numeric argument: { ${key.join('.')}: ${JSON.stringify(value)} }`);
       }
 
       let prevValue = getIn(context, key);
@@ -192,9 +163,7 @@ export function processor<EffectType extends EffectTypes>(
         throw new Error(
           `Cannot apply $mul to a value of non-numeric type. ${JSON.stringify(
             context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-numeric type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          )} has the field ${JSON.stringify(key.join('.'))} of non-numeric type ${JSON.stringify(typeof prevValue)}`
         );
       }
 
@@ -234,11 +203,9 @@ export function processor<EffectType extends EffectTypes>(
 
       if (!Array.isArray(prevValue)) {
         throw new Error(
-          `Cannot apply $addToSet to non-array field. ${JSON.stringify(
-            context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-array type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          `Cannot apply $addToSet to non-array field. ${JSON.stringify(context.state)} has the field ${JSON.stringify(
+            key.join('.')
+          )} of non-array type ${JSON.stringify(typeof prevValue)}`
         );
       }
 
@@ -260,11 +227,9 @@ export function processor<EffectType extends EffectTypes>(
 
       if (!Array.isArray(prevValue)) {
         throw new Error(
-          `Cannot apply $push to non-array field. ${JSON.stringify(
-            context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-array type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          `Cannot apply $push to non-array field. ${JSON.stringify(context.state)} has the field ${JSON.stringify(
+            key.join('.')
+          )} of non-array type ${JSON.stringify(typeof prevValue)}`
         );
       }
 
@@ -286,11 +251,9 @@ export function processor<EffectType extends EffectTypes>(
 
       if (!Array.isArray(prevValue)) {
         throw new Error(
-          `Cannot apply $pop to non-array field. ${JSON.stringify(
-            context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-array type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          `Cannot apply $pop to non-array field. ${JSON.stringify(context.state)} has the field ${JSON.stringify(
+            key.join('.')
+          )} of non-array type ${JSON.stringify(typeof prevValue)}`
         );
       }
 
@@ -312,11 +275,9 @@ export function processor<EffectType extends EffectTypes>(
 
       if (!Array.isArray(prevValue)) {
         throw new Error(
-          `Cannot apply $push to non-array field. ${JSON.stringify(
-            context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-array type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          `Cannot apply $push to non-array field. ${JSON.stringify(context.state)} has the field ${JSON.stringify(
+            key.join('.')
+          )} of non-array type ${JSON.stringify(typeof prevValue)}`
         );
       }
 
@@ -338,11 +299,9 @@ export function processor<EffectType extends EffectTypes>(
 
       if (!Array.isArray(prevValue)) {
         throw new Error(
-          `Cannot apply $pop to non-array field. ${JSON.stringify(
-            context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-array type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          `Cannot apply $pop to non-array field. ${JSON.stringify(context.state)} has the field ${JSON.stringify(
+            key.join('.')
+          )} of non-array type ${JSON.stringify(typeof prevValue)}`
         );
       }
 
@@ -364,11 +323,9 @@ export function processor<EffectType extends EffectTypes>(
 
       if (!Array.isArray(prevValue)) {
         throw new Error(
-          `Cannot apply $pullAll to non-array field. ${JSON.stringify(
-            context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-array type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          `Cannot apply $pullAll to non-array field. ${JSON.stringify(context.state)} has the field ${JSON.stringify(
+            key.join('.')
+          )} of non-array type ${JSON.stringify(typeof prevValue)}`
         );
       }
 
@@ -408,11 +365,9 @@ export function processor<EffectType extends EffectTypes>(
 
       if (!Array.isArray(prevValue)) {
         throw new Error(
-          `Cannot apply $pullAll to non-array field. ${JSON.stringify(
-            context.state
-          )} has the field ${JSON.stringify(key.join('.'))} of non-array type ${JSON.stringify(
-            typeof prevValue
-          )}`
+          `Cannot apply $pullAll to non-array field. ${JSON.stringify(context.state)} has the field ${JSON.stringify(
+            key.join('.')
+          )} of non-array type ${JSON.stringify(typeof prevValue)}`
         );
       }
 

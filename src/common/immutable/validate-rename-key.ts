@@ -26,8 +26,6 @@ export function validateRenameKey(context: ImmutableContext, target: any, key: T
   }
 
   if (isSourceArray) {
-    throw new Error(
-      `The ${target} field can't be an array element, ${JSON.stringify(key.join('.'))}`
-    );
+    throw new Error(`The ${target} field can't be an array element, ${JSON.stringify(key.join('.'))}`);
   }
 }

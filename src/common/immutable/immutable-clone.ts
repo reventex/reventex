@@ -14,9 +14,7 @@ export function immutableClone(context: ImmutableContext, key: TStrictKey, skipL
     const subKey: any = key[index];
 
     if (Object(pointer) !== pointer || (Array.isArray(pointer) && !isNonNegativeInteger(subKey))) {
-      throw new Error(
-        `Cannot create field ${JSON.stringify(subKey)} in element ${JSON.stringify(pointer)}`
-      );
+      throw new Error(`Cannot create field ${JSON.stringify(subKey)} in element ${JSON.stringify(pointer)}`);
     }
 
     if (Array.isArray(pointer[subKey])) {

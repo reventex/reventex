@@ -20,11 +20,9 @@ export function pullWithCompare(
 
   if (!Array.isArray(prevValue)) {
     throw new Error(
-      `Can't apply $pullAll to non-array field. ${JSON.stringify(
-        context.state
-      )} has the field ${JSON.stringify(key.join('.'))} of non-array type ${JSON.stringify(
-        typeof prevValue
-      )}`
+      `Can't apply $pullAll to non-array field. ${JSON.stringify(context.state)} has the field ${JSON.stringify(
+        key.join('.')
+      )} of non-array type ${JSON.stringify(typeof prevValue)}`
     );
   }
 

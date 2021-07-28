@@ -1,7 +1,6 @@
-import * as t from 'io-ts';
 import { Db, ClientSession } from 'mongodb';
 
-import { NarrowableString, TypesOf } from './types';
+import { ExtractCompileTimeTypes, ExtractCompileTimeType, TClass } from './types';
 
 type ResolveApi = {
   database: Db;
@@ -9,20 +8,20 @@ type ResolveApi = {
 };
 
 export class Resolver<
-  ResolverName extends NarrowableString,
-  Args extends ReadonlyArray<t.Any>,
-  Result extends t.Any
+  ResolverName extends string,
+  Args extends ReadonlyArray<TClass<any>>,
+  Result extends TClass<any>
 > {
   name: ResolverName;
   inputSchema: Args;
   outputSchema: Result;
-  implementation: (api: ResolveApi, ...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>;
+  implementation: (api: ResolveApi, ...args: ExtractCompileTimeTypes<Args>) => Promise<ExtractCompileTimeType<Result>>;
 
   constructor(
     name: ResolverName,
     inputSchema: Args,
     outputSchema: Result,
-    implementation: (api: ResolveApi, ...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>
+    implementation: (api: ResolveApi, ...args: ExtractCompileTimeTypes<Args>) => Promise<ExtractCompileTimeType<Result>>
   ) {
     this.name = name;
     this.inputSchema = inputSchema;
@@ -31,21 +30,19 @@ export class Resolver<
   }
 }
 
-export function resolver<ResolverName extends NarrowableString>(name: ResolverName) {
+export function resolver<ResolverName extends string>(name: ResolverName) {
   return {
-    withArgs<Args extends ReadonlyArray<t.Any>>(...inputSchemas: Args) {
+    withArgs<Args extends ReadonlyArray<TClass<any>>>(...inputSchemas: Args) {
       return {
-        returns<Result extends t.Any>(outputSchema: Result) {
+        returns<Result extends TClass<any>>(outputSchema: Result) {
           return {
             implements(
-              implementation: (api: ResolveApi, ...args: TypesOf<Args>) => Promise<t.TypeOf<Result>>
+              implementation: (
+                api: ResolveApi,
+                ...args: ExtractCompileTimeTypes<Args>
+              ) => Promise<ExtractCompileTimeType<Result>>
             ) {
-              return new Resolver<ResolverName, Args, Result>(
-                name,
-                inputSchemas,
-                outputSchema,
-                implementation
-              );
+              return new Resolver<ResolverName, Args, Result>(name, inputSchemas, outputSchema, implementation);
             },
           };
         },

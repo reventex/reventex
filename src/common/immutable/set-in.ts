@@ -20,9 +20,7 @@ export function setIn(context: ImmutableContext, key: TStrictKey, value: TValue 
     const isArray = Array.isArray(pointer);
 
     if (Object(pointer) !== pointer || (isArray && !isNonNegativeInteger(lastKey))) {
-      throw new Error(
-        `Cannot create field ${JSON.stringify(lastKey)} in element ${JSON.stringify(pointer)}`
-      );
+      throw new Error(`Cannot create field ${JSON.stringify(lastKey)} in element ${JSON.stringify(pointer)}`);
     }
 
     if (isArray && isNonNegativeInteger(lastKey)) {

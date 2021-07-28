@@ -1,8 +1,7 @@
 import { ObjectId, MongoClient, ClientSessionOptions, ClientSession, Collection } from 'mongodb';
-import * as t from 'io-ts';
 
 import { PRIVATE } from './constants';
-import { EventFromDatabase, EventFromClient, UnionOfTuple, NarrowableString } from './types';
+import { EventFromDatabase, EventFromClient, UnionOfTuple, NarrowableString, TClass } from './types';
 import { extractEntityIdsFromEvent } from './extract-entity-ids-from-event';
 import { Events } from './events';
 import { Projection } from './projection';
@@ -51,7 +50,7 @@ function ignoreNotExists(error: Error & { code?: number }) {
 
 export class Domain<
   EventStoreCollectionName extends string,
-  PayloadSchemas extends Record<UnionOfTuple<EventTypes>, t.Type<any>>,
+  PayloadSchemas extends Record<UnionOfTuple<EventTypes>, TClass<any>>,
   EventTypes extends ReadonlyArray<NarrowableString>,
   Projections extends Array<Projection<EventStoreCollectionName, any, any, any>>,
   Resolvers extends Map<string, Resolver<string, Array<any>, any>>
@@ -134,15 +133,11 @@ export class Domain<
 
     collectionPromises.push(
       database.createCollection(eventStoreCollectionName, { session }).catch(ignoreAlreadyExists),
-      database
-        .createCollection(eventStoreMetaCollectionName, { session })
-        .catch(ignoreAlreadyExists)
+      database.createCollection(eventStoreMetaCollectionName, { session }).catch(ignoreAlreadyExists)
     );
 
     for (const { name } of projections) {
-      collectionPromises.push(
-        database.createCollection(name, { session }).catch(ignoreAlreadyExists)
-      );
+      collectionPromises.push(database.createCollection(name, { session }).catch(ignoreAlreadyExists));
     }
 
     await Promise.all(collectionPromises);
@@ -186,8 +181,7 @@ export class Domain<
   }
 
   async build() {
-    const { builderClient, builderSession, databaseName, eventStoreCollectionName, projections } =
-      this[PRIVATE];
+    const { builderClient, builderSession, databaseName, eventStoreCollectionName, projections } = this[PRIVATE];
 
     const database = await (await builderClient).db(databaseName);
     const session = await builderSession;
@@ -196,9 +190,7 @@ export class Domain<
 
     const countProjections = projections.length;
 
-    const cursor = eventStore
-      .find({}, { session, projection: { _id: 0 } })
-      .sort({ 'entityId.documentVersion': 1 });
+    const cursor = eventStore.find({}, { session, projection: { _id: 0 } }).sort({ 'entityId.documentVersion': 1 });
 
     while (await cursor.hasNext()) {
       const item = await cursor.next();
@@ -287,13 +279,8 @@ export class Domain<
     await Promise.all(databasePromises);
   }
   async publish(events: Array<EventFromClient<EventTypes, PayloadSchemas>>) {
-    const {
-      projections,
-      builderClient,
-      builderSession,
-      eventStoreCollectionName,
-      eventStoreMetaCollectionName,
-    } = this[PRIVATE];
+    const { projections, builderClient, builderSession, eventStoreCollectionName, eventStoreMetaCollectionName } =
+      this[PRIVATE];
 
     const countEvents = events.length;
     const databasePromises: Array<Promise<any>> = [];
@@ -319,7 +306,7 @@ export class Domain<
           timestamp: -1,
         };
         const entityIds = extractEntityIdsFromEvent(event);
-        if (event == null || entityIds.length === 0) {
+        if (entityIds.length === 0) {
           throw new Error(`Incorrect event: ${JSON.stringify(event)}`);
         }
 
@@ -370,6 +357,8 @@ export class Domain<
         }
 
         const eventId = new ObjectId();
+        const eventWithoutTimestamp: any = { ...event };
+        delete eventWithoutTimestamp.timestamp;
         const { upsertedCount, modifiedCount } = await eventStore.updateOne(
           { _id: eventId },
           {
@@ -377,7 +366,7 @@ export class Domain<
               timestamp: true,
             },
             $setOnInsert: {
-              ...event,
+              ...eventWithoutTimestamp,
               entityId: entityIds,
             },
           },
@@ -392,18 +381,18 @@ export class Domain<
           throw concurrencyError;
         }
 
-        event.timestamp = (
-          await eventStore.findOne(
-            { _id: eventId },
-            {
-              session,
-              projection: {
-                _id: 0,
-                timestamp: 1,
-              },
-            }
-          )
-        ).timestamp;
+        const foundEvent = await eventStore.findOne(
+          { _id: eventId },
+          {
+            session,
+            projection: {
+              _id: 0,
+              timestamp: 1,
+            },
+          }
+        );
+
+        event.timestamp = foundEvent?.timestamp ?? -1;
 
         if (event.timestamp === -1) {
           throw new TypeError();
@@ -479,7 +468,7 @@ export class Domain<
 
 export const domain = <
   EventStoreCollectionName extends string,
-  PayloadSchemas extends Record<UnionOfTuple<EventTypes>, t.Type<any>>,
+  PayloadSchemas extends Record<UnionOfTuple<EventTypes>, TClass<any>>,
   EventTypes extends ReadonlyArray<NarrowableString>
 >(
   events: Events<EventStoreCollectionName, PayloadSchemas, EventTypes>
