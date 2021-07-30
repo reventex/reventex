@@ -224,4 +224,4 @@ export type EventHandler<
   event: Event<PayloadSchemas[EventType]>;
   api: MutationApi;
   documentId: string;
-}) => Generator<Effect<EffectTypes>, void, unknown>;
+}) => Generator<Effect<EffectTypes>, void, any>;

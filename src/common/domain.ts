@@ -278,7 +278,7 @@ export class Domain<
 
     await Promise.all(databasePromises);
   }
-  async publish(events: Array<EventFromClient<EventTypes, PayloadSchemas>>) {
+  async publish(...events: Array<EventFromClient<EventTypes, PayloadSchemas>>) {
     const { projections, builderClient, builderSession, eventStoreCollectionName, eventStoreMetaCollectionName } =
       this[PRIVATE];
 
