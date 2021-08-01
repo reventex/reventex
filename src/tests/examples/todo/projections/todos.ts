@@ -6,12 +6,14 @@ export default projection('todos', events)
     'TODO_ADDED',
     function* ({
       event: {
+        timestamp,
         payload: { userId, text },
       },
       api,
     }) {
       yield api.set({
-        userId,
+        ownerId: userId,
+        createdAt: timestamp,
         text,
         checked: false,
       });
@@ -19,6 +21,8 @@ export default projection('todos', events)
   )
   .on('TODO_TOGGLED', function* ({ api }) {
     const checked = yield api.get('checked');
+    console.log(checked, typeof checked)
+    console.log(yield api.get())
     yield api.set('checked', !checked);
   })
   .on('TODO_DELETED', function* ({ api }) {

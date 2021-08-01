@@ -3,9 +3,7 @@ import type { EntityId } from './entity-id';
 
 /* Helpers */
 
-export type NarrowableString = string;
-
-export type UnionOfTuple<T extends ReadonlyArray<any>> = T[number];
+export type UnionOfTuple<T extends ReadonlyArray<any> | [any]> = T[number];
 
 export type ExcludeFromTuple<T extends ReadonlyArray<any>, E> = T extends readonly [infer F, ...infer R]
   ? F extends E
@@ -23,6 +21,10 @@ export type Push<T extends any[], V> = [...T, V];
 export type TuplifyUnion<T, L = LastOf<T>, N = [T] extends [never] ? true : false> = true extends N
   ? []
   : Push<TuplifyUnion<Exclude<T, L>>, L>;
+
+export type BoxifyTuple<T extends ReadonlyArray<TClass<any>> | [TClass<any>]> = {
+  [P in keyof T]: T[P] extends TClass<any> ? ExtractCompileTimeType<T[P]> : never;
+};
 
 /* io-ts */
 
@@ -84,17 +86,41 @@ export class TRecord<T extends Record<any, TClass<any>>> extends TClass<
   }
 }
 
+export class TUnion<T extends ReadonlyArray<TClass<any>> | [TClass<any>]> extends TClass<
+  UnionOfTuple<ExtractCompileTimeTypes<T>>
+> {
+  [IO_TS_RUNTIME_TYPE] = 'union';
+  [IO_TS_RUNTIME_VALUE]: T;
+  constructor(value: T) {
+    super();
+    this[IO_TS_RUNTIME_VALUE] = value;
+  }
+}
+
+// const fsdfd1 = new TString();
+// const fsdfd2 = new TNumber();
+// const dfsdf = [fsdfd1, fsdfd2] as const;
+// type sdfdsfsd = UnionOfTuple<ExtractCompileTimeTypes<typeof dfsdf>>;
+// const dsfdsf = new TUnion(dfsdf);
+// type dsfsdfdsfsd = ExtractCompileTimeType<typeof dsfdsf>;
+
 export type ExtractCompileTimeType<T extends TClass<any>> = T[typeof IO_TS_COMPILE_TIME_TYPE];
 
-export type ExtractCompileTimeTypes<T extends ReadonlyArray<TClass<any>>> = T extends readonly [infer F, ...infer R]
-  ? F extends TClass<any>
-    ? R extends ReadonlyArray<TClass<any>>
-      ? readonly [ExtractCompileTimeType<F>, ...ExtractCompileTimeTypes<R>]
-      : never
-    : never
-  : T extends Array<any>
-  ? Array<any>
-  : [];
+export type ExtractCompileTimeTypes<T extends ReadonlyArray<TClass<any>> | [TClass<any>]> = BoxifyTuple<T> extends
+  | ReadonlyArray<any>
+  | [any]
+  ? BoxifyTuple<T>
+  : never;
+
+// export type ExtractCompileTimeTypes<T extends ReadonlyArray<TClass<any>>> = T extends readonly [infer F, ...infer R]
+//   ? F extends TClass<any>
+//     ? R extends ReadonlyArray<TClass<any>>
+//       ? readonly [ExtractCompileTimeType<F>, ...ExtractCompileTimeTypes<R>]
+//       : never
+//     : never
+//   : T extends Array<any>
+//   ? Array<any>
+//   : [];
 
 export class TEntityId<T extends string> extends TClass<EntityId<T>> {
   [IO_TS_RUNTIME_TYPE] = 'entityId';
@@ -218,7 +244,7 @@ export type MongoContext = {
 
 export type EventHandler<
   PayloadSchemas extends Record<UnionOfTuple<EventTypes>, TClass<any>>,
-  EventTypes extends ReadonlyArray<NarrowableString>,
+  EventTypes extends ReadonlyArray<string>,
   EventType extends UnionOfTuple<EventTypes>
 > = (context: {
   event: Event<PayloadSchemas[EventType]>;

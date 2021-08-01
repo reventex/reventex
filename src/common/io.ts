@@ -15,6 +15,7 @@ import {
   TUndefined,
   IO_TS_RUNTIME_VALUE,
   IO_TS_RUNTIME_TYPE,
+  TUnion,
 } from './types';
 
 export const t = {
@@ -29,6 +30,7 @@ export const t = {
   literal: <Type extends string>(value: Type): TLiteral<Type> => new TLiteral(value),
   array: <Type extends TClass<any>>(schema: Type): TArray<Type> => new TArray(schema),
   type: <Type extends Record<string, TClass<any>>>(schema: Type): TRecord<Type> => new TRecord(schema),
+  union: <Type extends ReadonlyArray<TClass<any>> | [TClass<any>]>(schema: Type) => new TUnion(schema),
 };
 
 function optionalAddEntityName(entityNames: Array<string>, schema: TClass<any> | undefined): void {

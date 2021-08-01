@@ -1,7 +1,7 @@
 import { ObjectId, MongoClient, ClientSessionOptions, ClientSession, Collection } from 'mongodb';
 
 import { PRIVATE } from './constants';
-import { EventFromDatabase, EventFromClient, UnionOfTuple, NarrowableString, TClass } from './types';
+import { EventFromDatabase, EventFromClient, UnionOfTuple, TClass } from './types';
 import { extractEntityIdsFromEvent } from './extract-entity-ids-from-event';
 import { Events } from './events';
 import { Projection } from './projection';
@@ -51,7 +51,7 @@ function ignoreNotExists(error: Error & { code?: number }) {
 export class Domain<
   EventStoreCollectionName extends string,
   PayloadSchemas extends Record<UnionOfTuple<EventTypes>, TClass<any>>,
-  EventTypes extends ReadonlyArray<NarrowableString>,
+  EventTypes extends ReadonlyArray<string>,
   Projections extends Array<Projection<EventStoreCollectionName, any, any, any>>,
   Resolvers extends Map<string, Resolver<string, Array<any>, any>>
 > {
@@ -230,7 +230,7 @@ export class Domain<
             });
 
             for (const effect of iterator) {
-              await processor(
+              const result = await processor(
                 {
                   documentId: documentIdAsObjectId,
                   collection,
@@ -456,20 +456,22 @@ export class Domain<
     const { resolvers, builderClient, builderSession, databaseName } = this[PRIVATE];
 
     const resolver = resolvers.get(resolverName);
+
     if (resolver == null) {
       throw new Error(`The resolver "${resolverName}" is not found`);
     }
     const session = await builderSession;
     const database = await (await builderClient).db(databaseName);
+    const objectId = () => new ObjectId();
 
-    return resolver.implementation({ database, session }, ...resolverArgs);
+    return await resolver.implementation({ database, session, objectId }, ...resolverArgs);
   }
 }
 
 export const domain = <
   EventStoreCollectionName extends string,
   PayloadSchemas extends Record<UnionOfTuple<EventTypes>, TClass<any>>,
-  EventTypes extends ReadonlyArray<NarrowableString>
+  EventTypes extends ReadonlyArray<string>
 >(
   events: Events<EventStoreCollectionName, PayloadSchemas, EventTypes>
 ) => ({

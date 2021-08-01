@@ -1,15 +1,34 @@
 import { t, resolver } from '../../../../server';
 
-export default resolver('getAllUsers')
+export default resolver('getAllTodos')
   .withArgs()
-  .returns(t.array(t.string))
+  .returns(
+    t.array(
+      t.type({
+        todoId: t.string,
+        ownerId: t.string,
+        text: t.string,
+        checked: t.boolean,
+      })
+    )
+  )
   .implements(async ({ database, session }) => {
     const documents = await database
-      .collection('users')
-      .find({}, { session, projection: { _id: 1 } })
+      .collection('todos')
+      .find({}, { session, projection: { _id: 1, todoId: 1, ownerId: 1, text: 1, checked: 1 } })
       .toArray();
 
-    const users: Array<string> = documents.map((document) => document._id);
+    const todos: Array<{
+      todoId: string;
+      ownerId: string;
+      text: string;
+      checked: boolean;
+    }> = documents.map(({ _id, ownerId, text, checked }) => ({
+      todoId: _id.toString(),
+      ownerId,
+      text,
+      checked,
+    }));
 
-    return users;
+    return todos;
   });
