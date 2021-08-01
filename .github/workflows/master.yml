@@ -22,7 +22,7 @@ jobs:
 
       - name: Install
         env:
-          YARN_CHECKSUM_BEHAVIOR:update
+          YARN_CHECKSUM_BEHAVIOR: update
         run: |
           yarn set version berry
           yarn install --immutable
