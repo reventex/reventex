@@ -1,5 +1,6 @@
 import type { ClientSession, Collection, ObjectId } from 'mongodb';
 import type { EntityId } from './entity-id';
+import type { Resolver } from './resolver';
 
 /* Helpers */
 
@@ -14,17 +15,20 @@ export type ExcludeFromTuple<T extends ReadonlyArray<any>, E> = T extends readon
 export type RecordByUnion<Union extends string, U extends Record<Union, any>> = U;
 
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
-export type LastOf<T> = UnionToIntersection<T extends any ? () => T : never> extends () => infer R ? R : never;
+type LastOfUnion<T> = UnionToIntersection<T extends any ? () => T : never> extends () => infer R ? R : never;
+type PushToTuple<T extends any[], V> = [...T, V];
 
-export type Push<T extends any[], V> = [...T, V];
+export type RecordFromEntries<A extends ReadonlyArray<readonly [PropertyKey, any] | [PropertyKey, any]>> = {
+  [K in A[number][0]]: Extract<A[number], readonly [K, any]>[1];
+};
 
-export type TuplifyUnion<T, L = LastOf<T>, N = [T] extends [never] ? true : false> = true extends N
+export type TuplifyUnion<T, L = LastOfUnion<T>, N = [T] extends [never] ? true : false> = true extends N
   ? []
-  : Push<TuplifyUnion<Exclude<T, L>>, L>;
+  : PushToTuple<TuplifyUnion<Exclude<T, L>>, L>;
 
 export type BoxifyTuple<T extends ReadonlyArray<TClass<any>> | [TClass<any>]> = {
   [P in keyof T]: T[P] extends TClass<any> ? ExtractCompileTimeType<T[P]> : never;
-};
+}; //& Iterable<any>;
 
 /* io-ts */
 
@@ -97,13 +101,6 @@ export class TUnion<T extends ReadonlyArray<TClass<any>> | [TClass<any>]> extend
   }
 }
 
-// const fsdfd1 = new TString();
-// const fsdfd2 = new TNumber();
-// const dfsdf = [fsdfd1, fsdfd2] as const;
-// type sdfdsfsd = UnionOfTuple<ExtractCompileTimeTypes<typeof dfsdf>>;
-// const dsfdsf = new TUnion(dfsdf);
-// type dsfsdfdsfsd = ExtractCompileTimeType<typeof dsfdsf>;
-
 export type ExtractCompileTimeType<T extends TClass<any>> = T[typeof IO_TS_COMPILE_TIME_TYPE];
 
 export type ExtractCompileTimeTypes<T extends ReadonlyArray<TClass<any>> | [TClass<any>]> = BoxifyTuple<T> extends
@@ -111,16 +108,6 @@ export type ExtractCompileTimeTypes<T extends ReadonlyArray<TClass<any>> | [TCla
   | [any]
   ? BoxifyTuple<T>
   : never;
-
-// export type ExtractCompileTimeTypes<T extends ReadonlyArray<TClass<any>>> = T extends readonly [infer F, ...infer R]
-//   ? F extends TClass<any>
-//     ? R extends ReadonlyArray<TClass<any>>
-//       ? readonly [ExtractCompileTimeType<F>, ...ExtractCompileTimeTypes<R>]
-//       : never
-//     : never
-//   : T extends Array<any>
-//   ? Array<any>
-//   : [];
 
 export class TEntityId<T extends string> extends TClass<EntityId<T>> {
   [IO_TS_RUNTIME_TYPE] = 'entityId';
@@ -152,6 +139,13 @@ export type Event<PayloadSchema extends TClass<any>> = {
   type: string;
   payload: ExtractCompileTimeType<PayloadSchema>;
 };
+
+type TupleFromResolvers<T extends ReadonlyArray<Resolver<any, any, any>> | [Resolver<any, any, any>]> = {
+  [K in keyof T]: T[K] extends Resolver<any, any, any> ? [T[K]['name'], T[K]] : never;
+};
+export type RecordFromResolvers<T extends ReadonlyArray<Resolver<any, any, any>>> = RecordFromEntries<
+  TupleFromResolvers<T>
+>;
 
 export type EventFromClient<
   EventTypes extends ReadonlyArray<string>,

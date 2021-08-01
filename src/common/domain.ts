@@ -1,7 +1,15 @@
 import { ObjectId, MongoClient, ClientSessionOptions, ClientSession, Collection } from 'mongodb';
 
 import { PRIVATE } from './constants';
-import { EventFromDatabase, EventFromClient, UnionOfTuple, TClass } from './types';
+import {
+  EventFromDatabase,
+  EventFromClient,
+  UnionOfTuple,
+  TClass,
+  RecordFromResolvers,
+  ExtractCompileTimeTypes,
+  ExtractCompileTimeType,
+} from './types';
 import { extractEntityIdsFromEvent } from './extract-entity-ids-from-event';
 import { Events } from './events';
 import { Projection } from './projection';
@@ -52,8 +60,8 @@ export class Domain<
   EventStoreCollectionName extends string,
   PayloadSchemas extends Record<UnionOfTuple<EventTypes>, TClass<any>>,
   EventTypes extends ReadonlyArray<string>,
-  Projections extends Array<Projection<EventStoreCollectionName, any, any, any>>,
-  Resolvers extends Map<string, Resolver<string, Array<any>, any>>
+  Projections extends ReadonlyArray<Projection<EventStoreCollectionName, any, any, any>>,
+  Resolvers extends Record<string, Resolver<any, any, any>>
 > {
   [PRIVATE]: {
     events: Events<EventStoreCollectionName, PayloadSchemas, EventTypes>;
@@ -74,7 +82,7 @@ export class Domain<
         events,
         projections: [],
         sideEffects: [],
-        resolvers: new Map(),
+        resolvers: {},
         documentId: ObjectId,
         eventStoreCollectionName: events.collectionName,
         eventStoreMetaCollectionName: `${events.collectionName}-meta`,
@@ -106,13 +114,21 @@ export class Domain<
     return this;
   }
   projections(projections: Array<Projection<any, any, any, any>>) {
-    this[PRIVATE].projections.push(...projections);
+    (this[PRIVATE].projections as any).push(...projections);
     return this;
   }
-  resolvers(resolvers: Array<Resolver<any, any, any>>) {
+  resolvers<TupleWithResolvers extends ReadonlyArray<Resolver<any, any, any>> | [Resolver<any, any, any>]>(
+    resolvers: TupleWithResolvers
+  ): Domain<
+    EventStoreCollectionName,
+    PayloadSchemas,
+    EventTypes,
+    Projections,
+    Resolvers & RecordFromResolvers<TupleWithResolvers>
+  > {
     for (const resolver of resolvers) {
       const { name } = resolver;
-      this[PRIVATE].resolvers.set(name, resolver);
+      Object.assign(this[PRIVATE].resolvers, { [name]: resolver });
     }
     return this;
   }
@@ -462,10 +478,13 @@ export class Domain<
       await (await resolverClient).close();
     }
   }
-  async read(resolverName: string, ...resolverArgs: Array<any>) {
+  async read<ResolverName extends keyof Resolvers>(
+    resolverName: ResolverName,
+    ...resolverArgs: ExtractCompileTimeTypes<Resolvers[ResolverName]['inputSchema']>
+  ): Promise<ExtractCompileTimeType<Resolvers[ResolverName]['outputSchema']>> {
     const { resolvers, builderClient, builderSession, databaseName } = this[PRIVATE];
 
-    const resolver = resolvers.get(resolverName);
+    const resolver = resolvers[resolverName];
 
     if (resolver == null) {
       throw new Error(`The resolver "${resolverName}" is not found`);
@@ -474,9 +493,14 @@ export class Domain<
     const database = await (await builderClient).db(databaseName);
     const objectId = (id: string) => new ObjectId(id);
 
-    return await resolver.implementation({ database, session, objectId }, ...resolverArgs);
+    return await (resolver.implementation as any)({ database, session, objectId }, ...resolverArgs);
   }
 }
+
+const emptyArray = [] as const;
+type EmptyArray = typeof emptyArray;
+const emptyObject = {} as const;
+type EmptyObject = typeof emptyObject;
 
 export const domain = <
   EventStoreCollectionName extends string,
@@ -486,15 +510,17 @@ export const domain = <
   events: Events<EventStoreCollectionName, PayloadSchemas, EventTypes>
 ) => ({
   connect(builderClient: Promise<MongoClient>, resolverClient?: Promise<MongoClient>) {
-    const instance = new Domain(events);
+    const instance = new Domain<EventStoreCollectionName, PayloadSchemas, EventTypes, EmptyArray, EmptyObject>(events);
     return instance.connect(builderClient, resolverClient);
   },
   projections(projections: Array<Projection<any, any, any, any>>) {
-    const instance = new Domain(events);
+    const instance = new Domain<EventStoreCollectionName, PayloadSchemas, EventTypes, EmptyArray, EmptyObject>(events);
     return instance.projections(projections);
   },
-  resolvers(resolvers: Array<Resolver<any, any, any>>) {
-    const instance = new Domain(events);
+  resolvers<TupleWithResolvers extends ReadonlyArray<Resolver<any, any, any>> | [Resolver<any, any, any>]>(
+    resolvers: TupleWithResolvers
+  ) {
+    const instance = new Domain<EventStoreCollectionName, PayloadSchemas, EventTypes, EmptyArray, EmptyObject>(events);
     return instance.resolvers(resolvers);
   },
 });
