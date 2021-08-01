@@ -229,8 +229,13 @@ export class Domain<
               api: mutationApi,
             });
 
-            for (const effect of iterator) {
-              const result = await processor(
+            let result: any = undefined;
+            for (;;) {
+              const { value: effect, done } = iterator.next(result);
+              if (done || effect == null) {
+                break;
+              }
+              result = await processor(
                 {
                   documentId: documentIdAsObjectId,
                   collection,
@@ -420,8 +425,13 @@ export class Domain<
                 api: mutationApi,
               });
 
-              for (const effect of iterator) {
-                await processor(
+              let result: any = undefined;
+              for (;;) {
+                const { value: effect, done } = iterator.next(result);
+                if (done || effect == null) {
+                  break;
+                }
+                result = await processor(
                   {
                     documentId: documentIdAsObjectId,
                     collection,
@@ -462,7 +472,7 @@ export class Domain<
     }
     const session = await builderSession;
     const database = await (await builderClient).db(databaseName);
-    const objectId = () => new ObjectId();
+    const objectId = (id: string) => new ObjectId(id);
 
     return await resolver.implementation({ database, session, objectId }, ...resolverArgs);
   }

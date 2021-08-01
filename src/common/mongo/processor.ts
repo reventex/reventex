@@ -353,9 +353,7 @@ export async function processor(context: MongoContext, effect: Effect<EffectType
       break;
     }
     case 'get': {
-      console.log('get started')
       const keyLength = key.length;
-      console.log('keyLength',keyLength)
 
       const projection: Projection<any> =
         keyLength === 0
@@ -365,19 +363,7 @@ export async function processor(context: MongoContext, effect: Effect<EffectType
               _id: 0,
             };
 
-      console.log('projection',projection)
-      console.log('documentId',documentId)
-
-
       const result = await collection.findOne({ _id: documentId }, { projection, session });
-
-      // console.log('result',result)
-
-
-
-      // if (keyLength === 0) {
-      //   return result;
-      // }
 
       let pointer = result;
 
@@ -388,8 +374,6 @@ export async function processor(context: MongoContext, effect: Effect<EffectType
         const pointerKey: any = key[index];
         pointer = pointer[pointerKey];
       }
-
-      console.log('pointer',pointer)
 
       return pointer;
     }

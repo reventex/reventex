@@ -28,7 +28,10 @@ jobs:
       - name: ESLint
         run: yarn lint
 
-      - name: Unit test
+      - name: Tests
+        env:
+          REVENTEX_MONGO_CONNECTION_USERNAME: ${{ secrets.REVENTEX_MONGO_CONNECTION_USERNAME }}
+          REVENTEX_MONGO_CONNECTION_PASSWORD: ${{ secrets.REVENTEX_MONGO_CONNECTION_PASSWORD }}
         run: yarn test
 
 
