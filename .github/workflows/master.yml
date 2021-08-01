@@ -21,11 +21,9 @@ jobs:
           cache: 'yarn'
 
       - name: Install
-        env:
-          YARN_CHECKSUM_BEHAVIOR: update
-        run: |
-          yarn set version berry
-          yarn install --immutable
+        uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: install # will run `yarn install` command
 
       - name: Prettier
         run: yarn prettier:check
