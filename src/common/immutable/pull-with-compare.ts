@@ -1,4 +1,4 @@
-import { ImmutableContext, TStrictKey, TValue } from '../types';
+import type { ImmutableContext, TStrictKey, TValue } from '../types/event-sourcing';
 import { getIn } from './get-in';
 import { setIn } from './set-in';
 import { immutableClone } from './immutable-clone';

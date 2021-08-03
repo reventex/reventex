@@ -1,5 +1,5 @@
+import type { MutationApi } from './types/event-sourcing';
 import { normalizeArgsK, normalizeArgsKK, normalizeArgsKV, normalizeArgsKVS } from './normalize';
-import { MutationApi } from './types';
 
 export const mutationApi: MutationApi = {
   set(...args) {

@@ -1,4 +1,4 @@
-import { ImmutableContext, TStrictKey, TValue } from '../types';
+import type { ImmutableContext, TStrictKey, TValue } from '../types/event-sourcing';
 import { isNonNegativeInteger } from './is-non-negative-integer';
 
 export function setIn(context: ImmutableContext, key: TStrictKey, value: TValue = null) {

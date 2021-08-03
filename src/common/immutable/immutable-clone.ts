@@ -1,4 +1,4 @@
-import { TStrictKey, ImmutableContext } from '../types';
+import type { ImmutableContext, TStrictKey } from '../types/event-sourcing';
 import { isNonNegativeInteger } from './is-non-negative-integer';
 
 export function immutableClone(context: ImmutableContext, key: TStrictKey, skipLastSubKey = false) {

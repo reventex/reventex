@@ -1,4 +1,4 @@
-import { TValue } from '../types';
+import type { TValue } from '../types/event-sourcing';
 import { deepCompare } from './deep-compare';
 
 export function getUniqueValues(items: Array<TValue>): Array<TValue> {

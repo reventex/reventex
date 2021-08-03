@@ -1,7 +1,9 @@
 import type { IndexDirection } from 'mongodb';
 
-import { UnionOfTuple, ExcludeFromTuple, EventHandler, ExtractEntityNames, TRecord, TClass } from './types';
-import { Events } from './events';
+import type { UnionOfTuple, ExcludeFromTuple } from './types/helpers';
+import type { EventHandler } from './types/event-sourcing';
+import type { ExtractEntityNames, TRecord, TClass } from './io';
+import type { Events } from './events';
 
 export class Projection<
   EventStoreCollectionName extends string,

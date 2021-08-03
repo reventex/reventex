@@ -1,4 +1,4 @@
-import { TValue } from '../types';
+import type { TValue } from '../types/event-sourcing';
 
 export function checkPrimitive(value: TValue) {
   if (value == null) {

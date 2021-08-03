@@ -1,4 +1,5 @@
-import { UnionOfTuple, TuplifyUnion, ExtractEntityNames, TClass, TRecord } from './types';
+import type { UnionOfTuple, TuplifyUnion } from './types/helpers';
+import type { ExtractEntityNames, TClass, TRecord } from './io';
 import { t, extractEntityNamesFromSchema } from './io';
 
 export class Events<

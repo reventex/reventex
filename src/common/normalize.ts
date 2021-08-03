@@ -1,4 +1,4 @@
-import { TKey, TStrictKey, TValue } from './types';
+import type { TKey, TStrictKey, TValue } from './types/event-sourcing';
 import { prepareKey } from './prepare-key';
 
 export const normalizeArgsKVS = (args: Array<any>): [TStrictKey, TValue, number | undefined] => {

@@ -31,10 +31,13 @@ jobs:
       - name: ESLint
         run: yarn lint
 
-      - name: Tests
+      - name: Unit Tests
+        run: yarn test
+
+      - name: Functional Tests
         env:
           REVENTEX_MONGO_CONNECTION_USERNAME: ${{ secrets.REVENTEX_MONGO_CONNECTION_USERNAME }}
           REVENTEX_MONGO_CONNECTION_PASSWORD: ${{ secrets.REVENTEX_MONGO_CONNECTION_PASSWORD }}
-        run: yarn test
+        run: yarn test:f
 
 

@@ -1,5 +1,4 @@
-import { EffectTypes, ImmutableContext } from '../types';
-import { Effect } from '../types';
+import type { EffectTypes, ImmutableContext, Effect } from '../types/event-sourcing';
 import { checkPrimitive } from './check-primitive';
 import { compareEQ, compareGT, compareGTE, compareLT, compareLTE } from './compare';
 import { deepCompare } from './deep-compare';

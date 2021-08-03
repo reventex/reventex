@@ -1,0 +1,10 @@
+{
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "moduleFileExtensions": [
+    "ts", "js"
+  ],
+  "testMatch": ["**/tests/**/*.functional.test.ts"],
+  "rootDir": "src",
+  "verbose": true
+}

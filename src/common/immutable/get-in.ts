@@ -1,4 +1,4 @@
-import { ImmutableContext, TStrictKey } from '../types';
+import type { ImmutableContext, TStrictKey } from '../types/event-sourcing';
 
 export function getIn(context: ImmutableContext, key: TStrictKey) {
   const lastIndex = key.length;

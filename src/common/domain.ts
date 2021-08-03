@@ -1,20 +1,16 @@
-import { ObjectId, MongoClient, ClientSessionOptions, ClientSession, Collection } from 'mongodb';
+import type { MongoClient, ClientSessionOptions, ClientSession, Collection } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
+import type { UnionOfTuple } from './types/helpers';
+import type { EventFromDatabase, EventFromClient, RecordFromResolvers } from './types/event-sourcing';
+import type { TClass, ExtractCompileTimeTypes, ExtractCompileTimeType } from './io';
+import type { Events } from './events';
+import type { Projection } from './projection';
+import type { Resolver } from './resolver';
+import type { EntityId } from './entity-id';
 import { PRIVATE } from './constants';
-import {
-  EventFromDatabase,
-  EventFromClient,
-  UnionOfTuple,
-  TClass,
-  RecordFromResolvers,
-  ExtractCompileTimeTypes,
-  ExtractCompileTimeType,
-} from './types';
+import { EntityIdWithDocumentVersion } from './entity-id';
 import { extractEntityIdsFromEvent } from './extract-entity-ids-from-event';
-import { Events } from './events';
-import { Projection } from './projection';
-import { Resolver } from './resolver';
-import { EntityId, EntityIdWithDocumentVersion } from './entity-id';
 import { processor } from './mongo/processor';
 import { mutationApi } from './mutation-api';
 

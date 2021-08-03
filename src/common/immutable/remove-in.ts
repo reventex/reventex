@@ -1,4 +1,4 @@
-import { ImmutableContext, TStrictKey } from '../types';
+import type { ImmutableContext, TStrictKey } from '../types/event-sourcing';
 import { isNonNegativeInteger } from './is-non-negative-integer';
 
 export function removeIn(context: ImmutableContext, key: TStrictKey) {

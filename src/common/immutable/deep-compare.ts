@@ -1,4 +1,4 @@
-import { TValue } from '../types';
+import type { TValue } from '../types/event-sourcing';
 import { compareEQ } from './compare';
 
 export function deepCompare(a: TValue = null, b: TValue = null, compare = compareEQ) {

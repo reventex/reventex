@@ -1,4 +1,4 @@
-import { ImmutableContext, TStrictKey } from '../types';
+import type { ImmutableContext, TStrictKey } from '../types/event-sourcing';
 
 export function validateRenameKey(context: ImmutableContext, target: any, key: TStrictKey): void {
   let isSourceArray = false;

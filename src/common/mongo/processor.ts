@@ -1,5 +1,6 @@
-import { TValue, MongoContext, Effect, EffectTypes } from '../types';
-import { Projection } from 'mongodb';
+import type { Projection } from 'mongodb';
+
+import type { TValue, MongoContext, Effect, EffectTypes } from '../types/event-sourcing';
 
 export async function processor(context: MongoContext, effect: Effect<EffectTypes>) {
   const { session, collection, documentId } = context;

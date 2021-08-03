@@ -1,12 +1,5 @@
-import { Db, ClientSession, ObjectId } from 'mongodb';
-
-import { ExtractCompileTimeTypes, ExtractCompileTimeType, TClass } from './types';
-
-type ResolveApi = {
-  database: Db;
-  session: ClientSession;
-  objectId: (id: string) => ObjectId;
-};
+import type { ResolveApi } from './types/event-sourcing';
+import type { ExtractCompileTimeTypes, ExtractCompileTimeType, TClass } from './io';
 
 export class Resolver<
   ResolverName extends string,
