@@ -1,5 +1,16 @@
-import type { ResolveApi } from './types/event-sourcing';
+import type { ResolveApi, RecordFromResolvers } from './types/event-sourcing';
 import type { ExtractCompileTimeTypes, ExtractCompileTimeType, TClass } from './io';
+
+export function recordOfResolvers<
+  Resolvers extends
+    | ReadonlyArray<Resolver<string, ReadonlyArray<TClass<any>>, TClass<any>>>
+    | [Resolver<string, ReadonlyArray<TClass<any>>, TClass<any>>]
+>(resolvers: Resolvers): RecordFromResolvers<Resolvers> {
+  return resolvers.reduce((acc: any, val) => {
+    acc[val.name] = val;
+    return acc;
+  }, {} as any);
+}
 
 export class Resolver<
   ResolverName extends string,

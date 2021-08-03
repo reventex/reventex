@@ -13,6 +13,7 @@ import { EntityIdWithDocumentVersion } from './entity-id';
 import { extractEntityIdsFromEvent } from './extract-entity-ids-from-event';
 import { processor } from './mongo/processor';
 import { mutationApi } from './mutation-api';
+import { recordOfResolvers } from './resolver';
 
 const sessionOptions: ClientSessionOptions = {
   causalConsistency: true,
@@ -57,7 +58,10 @@ export class Domain<
   PayloadSchemas extends Record<UnionOfTuple<EventTypes>, TClass<any>>,
   EventTypes extends ReadonlyArray<string>,
   Projections extends ReadonlyArray<Projection<EventStoreCollectionName, any, any, any>>,
-  Resolvers extends Record<string, Resolver<any, any, any>>
+  Resolvers extends RecordFromResolvers<
+    | ReadonlyArray<Resolver<string, ReadonlyArray<TClass<any>>, TClass<any>>>
+    | [Resolver<string, ReadonlyArray<TClass<any>>, TClass<any>>]
+  >
 > {
   [PRIVATE]: {
     events: Events<EventStoreCollectionName, PayloadSchemas, EventTypes>;
@@ -122,10 +126,7 @@ export class Domain<
     Projections,
     Resolvers & RecordFromResolvers<TupleWithResolvers>
   > {
-    for (const resolver of resolvers) {
-      const { name } = resolver;
-      Object.assign(this[PRIVATE].resolvers, { [name]: resolver });
-    }
+    Object.assign(this[PRIVATE].resolvers, recordOfResolvers(resolvers));
     return this;
   }
   async init() {
@@ -489,7 +490,7 @@ export class Domain<
     const database = await (await builderClient).db(databaseName);
     const objectId = (id: string) => new ObjectId(id);
 
-    return await (resolver.implementation as any)({ database, session, objectId }, ...resolverArgs);
+    return await (resolver.implementation as any)({ database, session, objectId }, ...(resolverArgs as any));
   }
 }
 
@@ -513,9 +514,11 @@ export const domain = <
     const instance = new Domain<EventStoreCollectionName, PayloadSchemas, EventTypes, EmptyArray, EmptyObject>(events);
     return instance.projections(projections);
   },
-  resolvers<TupleWithResolvers extends ReadonlyArray<Resolver<any, any, any>> | [Resolver<any, any, any>]>(
-    resolvers: TupleWithResolvers
-  ) {
+  resolvers<
+    TupleWithResolvers extends
+      | ReadonlyArray<Resolver<string, ReadonlyArray<TClass<any>>, TClass<any>>>
+      | [Resolver<string, ReadonlyArray<TClass<any>>, TClass<any>>]
+  >(resolvers: TupleWithResolvers) {
     const instance = new Domain<EventStoreCollectionName, PayloadSchemas, EventTypes, EmptyArray, EmptyObject>(events);
     return instance.resolvers(resolvers);
   },
