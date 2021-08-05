@@ -57,7 +57,9 @@ export class Domain<
   EventStoreCollectionName extends string,
   PayloadSchemas extends Record<UnionOfTuple<EventTypes>, TClass<any>>,
   EventTypes extends ReadonlyArray<string>,
-  Projections extends ReadonlyArray<Projection<EventStoreCollectionName, any, any, any>>,
+  Projections extends
+    | ReadonlyArray<Projection<EventStoreCollectionName, any, any, any>>
+    | [Projection<EventStoreCollectionName, any, any, any>],
   Resolvers extends RecordFromResolvers<
     | ReadonlyArray<Resolver<string, ReadonlyArray<TClass<any>>, TClass<any>>>
     | [Resolver<string, ReadonlyArray<TClass<any>>, TClass<any>>]
@@ -113,9 +115,12 @@ export class Domain<
 
     return this;
   }
-  projections(projections: Array<Projection<any, any, any, any>>) {
-    (this[PRIVATE].projections as any).push(...projections);
-    return this;
+  projections<NewProjections extends Array<Projection<EventStoreCollectionName, any, any, any>>>(
+    projections: NewProjections
+  ): Domain<EventStoreCollectionName, PayloadSchemas, EventTypes, [...Projections, ...NewProjections], Resolvers> {
+    const items: [...Projections, ...NewProjections] = [...this[PRIVATE].projections, ...projections];
+    Object.assign(this[PRIVATE], { projections: items });
+    return this as any;
   }
   resolvers<TupleWithResolvers extends ReadonlyArray<Resolver<any, any, any>> | [Resolver<any, any, any>]>(
     resolvers: TupleWithResolvers
@@ -127,7 +132,7 @@ export class Domain<
     Resolvers & RecordFromResolvers<TupleWithResolvers>
   > {
     Object.assign(this[PRIVATE].resolvers, recordOfResolvers(resolvers));
-    return this;
+    return this as any;
   }
   async init() {
     const {
@@ -490,7 +495,7 @@ export class Domain<
     const database = await (await builderClient).db(databaseName);
     const objectId = (id: string) => new ObjectId(id);
 
-    return await (resolver.implementation as any)({ database, session, objectId }, ...(resolverArgs as any));
+    return await resolver.implementation({ database, session, objectId }, ...[...resolverArgs]);
   }
 }
 

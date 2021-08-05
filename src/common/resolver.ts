@@ -14,7 +14,7 @@ export function recordOfResolvers<
 
 export class Resolver<
   ResolverName extends string,
-  Args extends ReadonlyArray<TClass<any>>,
+  Args extends ReadonlyArray<TClass<any>> | [TClass<any>],
   Result extends TClass<any>
 > {
   name: ResolverName;
@@ -37,7 +37,7 @@ export class Resolver<
 
 export function resolver<ResolverName extends string>(name: ResolverName) {
   return {
-    withArgs<Args extends ReadonlyArray<TClass<any>>>(...inputSchemas: Args) {
+    withArgs<Args extends ReadonlyArray<TClass<any>> | [TClass<any>]>(...inputSchemas: Args) {
       return {
         returns<Result extends TClass<any>>(outputSchema: Result) {
           return {
