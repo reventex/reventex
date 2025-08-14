@@ -1,0 +1,33 @@
+name: Main CI/CD
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!*/**'
+
+jobs:
+  workflow:
+    runs-on: ubuntu-latest
+
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.head_ref == 'dev')
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Setup
+        run: yarn install --immutable
+
+      - name: Prettier
+        run: yarn prettier:check
+
+      - name: ESLint
+        run: yarn lint
+
+      - name: Unit Tests
+        run: yarn test:coverage
