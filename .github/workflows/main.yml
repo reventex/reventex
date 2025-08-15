@@ -1,4 +1,4 @@
-name: Main CI/CD
+name: CI/CD
 
 on:
   push:
@@ -10,7 +10,13 @@ jobs:
   workflow:
     runs-on: ubuntu-latest
 
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.head_ref == 'dev')
+    on:
+      push:
+        branches:
+          - main
+      pull_request:
+        branches:
+          - main
 
     steps:
       - uses: actions/checkout@v2
