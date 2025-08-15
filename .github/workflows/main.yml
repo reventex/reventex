@@ -3,20 +3,13 @@ name: CI/CD
 on:
   push:
     branches:
-      - '*'
-      - '!*/**'
-
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
   workflow:
     runs-on: ubuntu-latest
-
-    on:
-      push:
-        branches:
-          - main
-      pull_request:
-        branches:
-          - main
 
     steps:
       - uses: actions/checkout@v2
