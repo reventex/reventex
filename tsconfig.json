@@ -1,23 +1,34 @@
 {
+  "extends": [
+    "@tsconfig/recommended"
+  ],
+  "compileOnSave": false,
   "compilerOptions": {
-    "module": "ESNext",
-    "target": "ES2015",
-    "lib": ["ES2015", "DOM"],
-    "rootDir": "src",
-    "outDir": "lib",
-    "strict": true,
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "noImplicitThis": false,
-    "esModuleInterop": true,
+    "rootDir": ".",
     "sourceMap": true,
+    "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
-    "removeComments": false,
     "resolveJsonModule": true,
+    "importHelpers": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "strict": true,
     "noUncheckedIndexedAccess": true,
-    "composite": false,
-    "types": ["node", "jest"],
-  }
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "useUnknownInCatchVariables": true,
+    "baseUrl": ".",
+    "noPropertyAccessFromIndexSignature": false,
+    "exactOptionalPropertyTypes": false,
+    "strictBuiltinIteratorReturn": true,
+    "lib": ["ES2017", "DOM", "ESNext"],
+    "target": "ES2019",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "verbatimModuleSyntax": true
+  },
+  "exclude": ["node_modules"],
+  "include": ["./src"]
 }
+
